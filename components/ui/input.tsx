@@ -1,39 +1,32 @@
-import { StyleSheet, Text, TextInput, type TextInputProps } from "react-native";
+import { TextInput, Text, View, type TextInputProps } from "react-native";
+
+import { cn } from "@/lib/utils/cn";
 
 type InputProps = TextInputProps & {
   error?: string;
+  containerClassName?: string;
 };
 
-export function Input({ error, style, ...props }: InputProps) {
+export function Input({
+  error,
+  className,
+  containerClassName,
+  ...props
+}: InputProps) {
   return (
-    <>
+    <View className={containerClassName}>
       <TextInput
-        style={[styles.input, error ? styles.inputError : null, style]}
-        placeholderTextColor="#9ca3af"
+        className={cn(
+          "rounded-xl border bg-surface px-4 py-3 font-sans text-base text-foreground",
+          error ? "border-danger" : "border-border",
+          className
+        )}
+        placeholderTextColor="#94a3b8"
         {...props}
       />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-    </>
+      {error ? (
+        <Text className="mt-1 font-sans text-sm text-danger">{error}</Text>
+      ) : null}
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  input: {
-    borderWidth: 1,
-    borderColor: "#d1d5db",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    fontSize: 16,
-    backgroundColor: "#ffffff",
-    color: "#111827",
-  },
-  inputError: {
-    borderColor: "#ef4444",
-  },
-  error: {
-    color: "#ef4444",
-    fontSize: 14,
-    marginTop: 4,
-  },
-});

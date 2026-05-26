@@ -1,19 +1,21 @@
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { Redirect } from "expo-router";
 
-// Placeholder — root _layout auth guard redirects to the correct group.
+import { useAuth } from "@/context/auth-provider";
+
 export default function Index() {
-  return (
-    <View style={styles.container}>
-      <ActivityIndicator size="large" color="#2563eb" />
-    </View>
-  );
-}
+  const { isLoading, token, messId } = useAuth();
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#f9fafb",
-  },
-});
+  if (isLoading) {
+    return null;
+  }
+
+  if (!token) {
+    return <Redirect href="/(auth)/login" />;
+  }
+
+  if (!messId) {
+    return <Redirect href="/(onboarding)/create-mess" />;
+  }
+
+  return <Redirect href="/(app)/(tabs)" />;
+}

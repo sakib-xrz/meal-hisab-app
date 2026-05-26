@@ -1,32 +1,37 @@
 import { Stack } from "expo-router";
 
+import { stackHeaderOptions } from "@/components/ui/app-header";
+
 export default function AppLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
       <Stack.Screen
         name="members/add"
-        options={{ presentation: "modal", headerShown: true, title: "Add Member" }}
+        options={{
+          presentation: "modal",
+          ...stackHeaderOptions("Add Member"),
+        }}
       />
       <Stack.Screen
         name="members/[id]"
-        options={{ headerShown: true, title: "Edit Member" }}
+        options={stackHeaderOptions("Edit Member")}
       />
       <Stack.Screen
         name="meals/summary"
-        options={{ headerShown: true, title: "Meal Summary" }}
+        options={stackHeaderOptions("Meal Summary")}
       />
       <Stack.Screen
         name="meals/history"
-        options={{ headerShown: true, title: "Meal History" }}
+        options={stackHeaderOptions("Meal History")}
       />
       <Stack.Screen
         name="meals/[id]"
-        options={{ headerShown: true, title: "Edit Meal" }}
+        options={stackHeaderOptions("Edit Meal")}
       />
       <Stack.Screen
         name="settings/transfer-ownership"
-        options={{ headerShown: true, title: "Transfer Ownership" }}
+        options={stackHeaderOptions("Transfer Ownership")}
       />
     </Stack>
   );

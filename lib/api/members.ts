@@ -1,6 +1,8 @@
 import { apiRequest } from "@/lib/api/client";
 import { resolveRoleKey } from "@/lib/api/normalize";
 import type { Member, MemberApiRow, RoleKey } from "@/lib/api/types";
+import { resolveAssetUrl } from "@/lib/utils/assets";
+import { normalizeApiDate } from "@/lib/utils/dates";
 
 function normalizeMember(row: MemberApiRow): Member {
   return {
@@ -11,9 +13,9 @@ function normalizeMember(row: MemberApiRow): Member {
     roomNo: row.roomNo,
     roleKey: row.roleKey ?? resolveRoleKey(row.role) ?? "MEMBER",
     status: row.status,
-    joiningDate: row.joiningDate,
-    leavingDate: row.leavingDate,
-    avatarUrl: row.avatarUrl,
+    joiningDate: row.joiningDate ? normalizeApiDate(row.joiningDate) : row.joiningDate,
+    leavingDate: row.leavingDate ? normalizeApiDate(row.leavingDate) : row.leavingDate,
+    avatarUrl: row.avatarUrl ? resolveAssetUrl(row.avatarUrl) : row.avatarUrl,
   };
 }
 

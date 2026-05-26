@@ -1,9 +1,17 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+
+import { cn } from "@/lib/utils/cn";
+
+type SegmentOption<T extends string> = {
+  value: T;
+  label: string;
+};
 
 type SegmentControlProps<T extends string> = {
-  options: { value: T; label: string }[];
+  options: SegmentOption<T>[];
   value: T;
   onChange: (value: T) => void;
+  className?: string;
   disabled?: boolean;
 };
 
@@ -11,24 +19,36 @@ export function SegmentControl<T extends string>({
   options,
   value,
   onChange,
+  className,
   disabled,
 }: SegmentControlProps<T>) {
   return (
-    <View style={styles.row}>
+    <View
+      className={cn(
+        "flex-row rounded-xl border border-border bg-slate-100 p-1",
+        className
+      )}
+    >
       {options.map((option) => {
         const selected = option.value === value;
         return (
           <Pressable
             key={option.value}
-            disabled={disabled}
-            onPress={() => onChange(option.value)}
-            style={[
-              styles.segment,
-              selected && styles.segmentSelected,
-              disabled && styles.disabled,
-            ]}
+            onPress={() => !disabled && onChange(option.value)}
+            className={cn(
+              "flex-1 items-center rounded-lg px-3 py-2",
+              selected && "bg-surface shadow-sm shadow-black/5",
+              disabled && "opacity-50"
+            )}
+            accessibilityRole="button"
+            accessibilityState={{ selected }}
           >
-            <Text style={[styles.label, selected && styles.labelSelected]}>
+            <Text
+              className={cn(
+                "font-sans text-sm font-medium",
+                selected ? "text-primary" : "text-muted"
+              )}
+            >
               {option.label}
             </Text>
           </Pressable>
@@ -37,35 +57,3 @@ export function SegmentControl<T extends string>({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    gap: 8,
-    flexWrap: "wrap",
-  },
-  segment: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#d1d5db",
-    backgroundColor: "#f9fafb",
-  },
-  segmentSelected: {
-    borderColor: "#2563eb",
-    backgroundColor: "#eff6ff",
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#6b7280",
-  },
-  labelSelected: {
-    color: "#2563eb",
-    fontWeight: "600",
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-});

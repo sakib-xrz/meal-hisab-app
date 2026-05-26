@@ -6,8 +6,11 @@ import { Controller, useForm } from "react-hook-form";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
-import { Button, Label } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { LoadingScreen, Screen } from "@/components/ui/screen";
 import { SegmentControl } from "@/components/ui/segment-control";
 import { ApiError } from "@/lib/api/client";
@@ -158,15 +161,15 @@ export default function EditMemberScreen() {
 
   if (!member) {
     return (
-      <Screen title="Edit member">
-        <Text className="text-gray-500 text-center py-8">Member not found.</Text>
+      <Screen edges={[]}>
+        <EmptyState title="Not found" description="Member not found." />
       </Screen>
     );
   }
 
   return (
     <Screen
-      title="Edit member"
+      edges={[]}
       subtitle={isLeft ? "This member has left" : undefined}
       keyboardAvoid
       footer={
@@ -175,148 +178,150 @@ export default function EditMemberScreen() {
         ) : undefined
       }
     >
-      <View className="gap-4 mt-2">
-        <View>
-          <Label>Full name *</Label>
-          <Controller
-            control={control}
-            name="fullName"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                editable={!isLeft}
-                error={errors.fullName?.message}
-              />
-            )}
-          />
+      <Card>
+        <View className="gap-4">
+          <View>
+            <Label>Full name *</Label>
+            <Controller
+              control={control}
+              name="fullName"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  editable={!isLeft}
+                  error={errors.fullName?.message}
+                />
+              )}
+            />
+          </View>
+
+          <View>
+            <Label>Phone</Label>
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  keyboardType="phone-pad"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  editable={!isLeft}
+                />
+              )}
+            />
+          </View>
+
+          <View>
+            <Label>Email</Label>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  editable={!isLeft}
+                  error={errors.email?.message}
+                />
+              )}
+            />
+          </View>
+
+          <View>
+            <Label>Room no</Label>
+            <Controller
+              control={control}
+              name="roomNo"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  editable={!isLeft}
+                />
+              )}
+            />
+          </View>
+
+          <View>
+            <Label>Joining date</Label>
+            <Controller
+              control={control}
+              name="joiningDate"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  placeholder="YYYY-MM-DD"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  editable={!isLeft}
+                  error={errors.joiningDate?.message}
+                />
+              )}
+            />
+          </View>
+
+          <View>
+            <Label>Leaving date</Label>
+            <Controller
+              control={control}
+              name="leavingDate"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  placeholder="YYYY-MM-DD"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  editable={!isLeft}
+                  error={errors.leavingDate?.message}
+                />
+              )}
+            />
+          </View>
+
+          {isOwner ? (
+            <Text className="font-sans text-sm text-muted">
+              Owner — role and status cannot be changed here. Use transfer ownership first.
+            </Text>
+          ) : (
+            <>
+              <View>
+                <Label>Role</Label>
+                <SegmentControl
+                  options={ROLE_OPTIONS}
+                  value={roleKey}
+                  onChange={(v) => setValue("roleKey", v as "MEMBER" | "MANAGER")}
+                  disabled={isLeft}
+                />
+              </View>
+
+              <View>
+                <Label>Status</Label>
+                <SegmentControl
+                  options={STATUS_OPTIONS}
+                  value={status}
+                  onChange={(v) => setValue("status", v as "ACTIVE" | "INACTIVE")}
+                  disabled={isLeft}
+                />
+              </View>
+            </>
+          )}
+
+          {!isLeft ? (
+            <Button
+              title="Save changes"
+              loading={updateMutation.isPending}
+              onPress={handleSubmit(onSubmit)}
+            />
+          ) : null}
         </View>
-
-        <View>
-          <Label>Phone</Label>
-          <Controller
-            control={control}
-            name="phone"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                keyboardType="phone-pad"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                editable={!isLeft}
-              />
-            )}
-          />
-        </View>
-
-        <View>
-          <Label>Email</Label>
-          <Controller
-            control={control}
-            name="email"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                editable={!isLeft}
-                error={errors.email?.message}
-              />
-            )}
-          />
-        </View>
-
-        <View>
-          <Label>Room no</Label>
-          <Controller
-            control={control}
-            name="roomNo"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                editable={!isLeft}
-              />
-            )}
-          />
-        </View>
-
-        <View>
-          <Label>Joining date</Label>
-          <Controller
-            control={control}
-            name="joiningDate"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                placeholder="YYYY-MM-DD"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                editable={!isLeft}
-                error={errors.joiningDate?.message}
-              />
-            )}
-          />
-        </View>
-
-        <View>
-          <Label>Leaving date</Label>
-          <Controller
-            control={control}
-            name="leavingDate"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                placeholder="YYYY-MM-DD"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                editable={!isLeft}
-                error={errors.leavingDate?.message}
-              />
-            )}
-          />
-        </View>
-
-        {isOwner ? (
-          <Text className="text-gray-500 text-sm">
-            Owner — role and status cannot be changed here. Use transfer ownership first.
-          </Text>
-        ) : (
-          <>
-            <View>
-              <Label>Role</Label>
-              <SegmentControl
-                options={ROLE_OPTIONS}
-                value={roleKey}
-                onChange={(v) => setValue("roleKey", v as "MEMBER" | "MANAGER")}
-                disabled={isLeft}
-              />
-            </View>
-
-            <View>
-              <Label>Status</Label>
-              <SegmentControl
-                options={STATUS_OPTIONS}
-                value={status}
-                onChange={(v) => setValue("status", v as "ACTIVE" | "INACTIVE")}
-                disabled={isLeft}
-              />
-            </View>
-          </>
-        )}
-
-        {!isLeft ? (
-          <Button
-            title="Save changes"
-            loading={updateMutation.isPending}
-            onPress={handleSubmit(onSubmit)}
-          />
-        ) : null}
-      </View>
+      </Card>
     </Screen>
   );
 }

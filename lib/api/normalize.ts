@@ -1,4 +1,5 @@
 import type { Membership, RoleKey, User } from "@/lib/api/types";
+import { resolveAssetUrl } from "@/lib/utils/assets";
 
 type ApiRole = RoleKey | { key: RoleKey; id?: string; name?: string };
 
@@ -30,6 +31,7 @@ export function normalizeMembership(m: ApiMembership): Membership {
 export function normalizeUser(raw: ApiUser): User {
   return {
     ...raw,
+    avatarUrl: resolveAssetUrl(raw.avatarUrl),
     memberships: (raw.memberships ?? []).map(normalizeMembership),
   };
 }

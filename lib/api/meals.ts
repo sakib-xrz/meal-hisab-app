@@ -7,6 +7,7 @@ import type {
   MealPeriodSummary,
   MealSummary,
 } from "@/lib/api/types";
+import { normalizeApiDate } from "@/lib/utils/dates";
 
 function toMealCount(value: unknown): number {
   const n = Number(value);
@@ -63,7 +64,7 @@ function normalizeDailyMealSheet(raw: {
   summary?: ApiMealSummary;
 }): DailyMealSheet {
   return {
-    date: raw.date,
+    date: normalizeApiDate(raw.date),
     members: (raw.members ?? []).map(normalizeMealMemberRow),
     summary: normalizeMealSummary(raw.summary ?? {}),
   };
@@ -83,6 +84,7 @@ function normalizeMealEntry(raw: ApiMealEntry): MealEntry {
 
   return {
     ...raw,
+    mealDate: normalizeApiDate(raw.mealDate),
     breakfast,
     lunch,
     dinner,
@@ -118,8 +120,8 @@ type ApiMealPeriodSummary = {
 
 function normalizeMealPeriodSummary(raw: ApiMealPeriodSummary): MealPeriodSummary {
   return {
-    from: raw.from,
-    to: raw.to,
+    from: normalizeApiDate(raw.from),
+    to: normalizeApiDate(raw.to),
     totalMeals: toMealCount(raw.totalMeals),
     byMember: (raw.byMember ?? []).map((member) => ({
       memberId: member.memberId,
@@ -130,7 +132,7 @@ function normalizeMealPeriodSummary(raw: ApiMealPeriodSummary): MealPeriodSummar
       total: toMealCount(member.total ?? member.totalMeals),
     })),
     byDate: (raw.byDate ?? []).map((day) => ({
-      date: day.date,
+      date: normalizeApiDate(day.date),
       breakfast: toMealCount(day.breakfast),
       lunch: toMealCount(day.lunch),
       dinner: toMealCount(day.dinner),
@@ -196,8 +198,8 @@ export function listMeals(params: {
       tenant: true,
     },
   ).then((raw) => ({
-    from: raw.from,
-    to: raw.to,
+    from: normalizeApiDate(raw.from),
+    to: normalizeApiDate(raw.to),
     entries: (raw.entries ?? []).map(normalizeMealEntry),
   }));
 }

@@ -1,21 +1,14 @@
-import { Text, View } from "react-native";
 import { Link } from "expo-router";
+import { Pressable, Text, View } from "react-native";
 
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { ErrorState } from "@/components/ui/error-state";
 import { Screen } from "@/components/ui/screen";
+import { StatRow } from "@/components/ui/stat-row";
 import { useAuth } from "@/context/auth-provider";
 import { useCurrentMess, useMessStats } from "@/lib/queries/mess";
 import { formatBdt, formatMealRate } from "@/lib/utils/format";
-
-function StatRow({ label, value }: { label: string; value: string }) {
-  return (
-    <View className="flex-row justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-      <Text className="text-gray-600 dark:text-gray-400">{label}</Text>
-      <Text className="font-semibold text-gray-900 dark:text-gray-100">{value}</Text>
-    </View>
-  );
-}
 
 export default function DashboardScreen() {
   const { myRole } = useAuth();
@@ -49,45 +42,63 @@ export default function DashboardScreen() {
       ) : null}
 
       {stats ? (
-        <Card className="mb-4">
-          <Text className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            This month
-          </Text>
+        <Card title="This month" className="mb-4">
           <StatRow label="Active members" value={String(stats.activeMemberCount)} />
           <StatRow label="Total meals" value={String(stats.totalMeals)} />
           <StatRow label="Bazaar cost" value={formatBdt(stats.totalBazaarCost)} />
           <StatRow label="Extra expenses" value={formatBdt(stats.totalExtraExpense)} />
           <StatRow label="Payments" value={formatBdt(stats.totalPayments)} />
-          <StatRow label="Meal rate" value={formatMealRate(stats.mealRate)} />
+          <StatRow label="Meal rate" value={formatMealRate(stats.mealRate)} highlight />
         </Card>
       ) : null}
 
       {mess ? (
-        <Card>
-          <Text className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            Mess info
-          </Text>
+        <Card title="Mess info">
           {mess.address ? (
-            <Text className="text-gray-600 dark:text-gray-400 mb-1">{mess.address}</Text>
+            <Text className="mb-1 font-sans text-base text-muted">{mess.address}</Text>
           ) : null}
           {mess.phone ? (
-            <Text className="text-gray-600 dark:text-gray-400 mb-1">{mess.phone}</Text>
+            <Text className="mb-1 font-sans text-base text-muted">{mess.phone}</Text>
           ) : null}
           {mess.owner ? (
-            <Text className="text-gray-600 dark:text-gray-400 mb-1">
+            <Text className="mb-2 font-sans text-base text-muted">
               Owner: {mess.owner.name}
             </Text>
           ) : null}
-          <Text className="text-gray-500 text-sm">
-            {mess.activeMemberCount ?? 0} active members ·{" "}
-            {mess.isActive ? "Active" : "Inactive"}
-          </Text>
+          <View className="flex-row flex-wrap gap-2">
+            <Badge
+              label={`${mess.activeMemberCount ?? 0} active members`}
+              variant="primary"
+            />
+            <Badge label={mess.isActive ? "Active" : "Inactive"} variant="muted" />
+          </View>
         </Card>
       ) : null}
 
-      <Link href="/(app)/meals/summary" asChild>
-        <Text className="text-blue-600 font-medium mt-4">View meal summary →</Text>
-      </Link>
+      <View className="mt-6 gap-3">
+        <Link href="/(app)/meals/summary" asChild>
+          <Pressable className="flex-row items-center justify-between rounded-2xl border border-border bg-surface px-4 py-4 active:opacity-80">
+            <View>
+              <Text className="font-sans text-base font-semibold text-foreground">
+                Meal summary
+              </Text>
+              <Text className="font-sans text-sm text-muted">Monthly breakdown</Text>
+            </View>
+            <Text className="font-sans text-xl text-primary">›</Text>
+          </Pressable>
+        </Link>
+        <Link href="/(app)/meals/history" asChild>
+          <Pressable className="flex-row items-center justify-between rounded-2xl border border-border bg-surface px-4 py-4 active:opacity-80">
+            <View>
+              <Text className="font-sans text-base font-semibold text-foreground">
+                Meal history
+              </Text>
+              <Text className="font-sans text-sm text-muted">View past entries</Text>
+            </View>
+            <Text className="font-sans text-xl text-primary">›</Text>
+          </Pressable>
+        </Link>
+      </View>
     </Screen>
   );
 }

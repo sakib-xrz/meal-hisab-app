@@ -5,8 +5,11 @@ import { View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
-import { Button, Label } from "@/components/ui/button";
+import { BrandHero } from "@/components/ui/brand-hero";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Screen } from "@/components/ui/screen";
 import { useAuth } from "@/context/auth-provider";
 import { ApiError } from "@/lib/api/client";
@@ -26,7 +29,7 @@ export default function CreateMessScreen() {
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { name: "", address: "", phone: "" },
@@ -58,76 +61,77 @@ export default function CreateMessScreen() {
 
   return (
     <Screen
-      title="Create your mess"
-      subtitle="You need a mess before using the app. One mess per user."
       keyboardAvoid
+      hero={<BrandHero subtitle="Set up your mess to start tracking meals" />}
     >
-      <View className="gap-4 mt-4">
-        <View>
-          <Label>Mess name *</Label>
-          <Controller
-            control={control}
-            name="name"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                placeholder="Bashundhara Bachelor Mess"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                error={errors.name?.message}
-              />
-            )}
+      <Card title="Mess details" subtitle="One mess per account">
+        <View className="gap-4">
+          <View>
+            <Label>Mess name *</Label>
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  placeholder="Bashundhara Bachelor Mess"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  error={errors.name?.message}
+                />
+              )}
+            />
+          </View>
+
+          <View>
+            <Label>Address</Label>
+            <Controller
+              control={control}
+              name="address"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  placeholder="Optional"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                />
+              )}
+            />
+          </View>
+
+          <View>
+            <Label>Contact phone</Label>
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  placeholder="Optional"
+                  keyboardType="phone-pad"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                />
+              )}
+            />
+          </View>
+
+          <Button
+            title="Create Mess"
+            loading={createMessMutation.isPending}
+            onPress={handleSubmit(onSubmit)}
+          />
+
+          <Button
+            title="Sign out"
+            variant="secondary"
+            onPress={async () => {
+              await signOut();
+              router.replace("/(auth)/login");
+            }}
           />
         </View>
-
-        <View>
-          <Label>Address</Label>
-          <Controller
-            control={control}
-            name="address"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                placeholder="Optional"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-              />
-            )}
-          />
-        </View>
-
-        <View>
-          <Label>Contact phone</Label>
-          <Controller
-            control={control}
-            name="phone"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                placeholder="Optional"
-                keyboardType="phone-pad"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-              />
-            )}
-          />
-        </View>
-
-        <Button
-          title="Create Mess"
-          loading={createMessMutation.isPending}
-          onPress={handleSubmit(onSubmit)}
-        />
-
-        <Button
-          title="Sign out"
-          variant="secondary"
-          onPress={async () => {
-            await signOut();
-            router.replace("/(auth)/login");
-          }}
-        />
-      </View>
+      </Card>
     </Screen>
   );
 }

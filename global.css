@@ -1,2 +1,36 @@
 @import "tailwindcss";
 @import "uniwind";
+
+@theme {
+  --color-primary: #0d9488;
+  --color-primary-soft: #ccfbf1;
+  --color-primary-dark: #0f766e;
+  --color-accent: #f59e0b;
+  --color-accent-soft: #fef3c7;
+  --color-surface: #ffffff;
+  --color-background: #f8fafc;
+  --color-muted: #64748b;
+  --color-border: #e2e8f0;
+  --color-danger: #e11d48;
+  --color-danger-soft: #ffe4e6;
+  --color-foreground: #0f172a;
+  --color-foreground-secondary: #475569;
+  --font-sans: "PlusJakartaSans_400Regular";
+  --radius-input: 12px;
+  --radius-card: 16px;
+  --radius-hero: 20px;
+}
+
+@layer utilities {
+  .font-medium {
+    font-family: PlusJakartaSans_500Medium;
+  }
+
+  .font-semibold {
+    font-family: PlusJakartaSans_600SemiBold;
+  }
+
+  .font-bold {
+    font-family: PlusJakartaSans_700Bold;
+  }
+}

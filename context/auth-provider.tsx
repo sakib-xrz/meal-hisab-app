@@ -128,10 +128,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const storedToken = await getAccessToken();
         if (storedToken) {
-          await refreshUser();
+          await Promise.race([
+            refreshUser(),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error("Session restore timed out")), 10000),
+            ),
+          ]);
         }
       } catch {
         await clearSession();
+        if (mounted) {
+          setUser(null);
+          setToken(null);
+          setMessIdState(null);
+        }
       } finally {
         if (mounted) {
           setIsLoading(false);

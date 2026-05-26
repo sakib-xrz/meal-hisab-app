@@ -5,8 +5,11 @@ import { Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
-import { Button, Label } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { BrandHero } from "@/components/ui/brand-hero";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Screen } from "@/components/ui/screen";
 import { useAuth } from "@/context/auth-provider";
 import { ApiError } from "@/lib/api/client";
@@ -33,7 +36,6 @@ export default function RegisterScreen() {
   const onSubmit = async (values: FormValues) => {
     try {
       await signUp(values.name, values.phone, values.password);
-      // Root layout auth guard handles redirect.
     } catch (err) {
       Toast.show({
         type: "error",
@@ -44,75 +46,78 @@ export default function RegisterScreen() {
   };
 
   return (
-    <Screen title="Create account" subtitle="Register to get started" keyboardAvoid>
-      <View className="gap-4 mt-4">
-        <View>
-          <Label>Full name</Label>
-          <Controller
-            control={control}
-            name="name"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                placeholder="Your name"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                error={errors.name?.message}
-              />
-            )}
+    <Screen keyboardAvoid contentClassName="pt-0">
+      <BrandHero compact className="mb-4" />
+      <Card title="Create account" subtitle="Register to get started">
+        <View className="gap-4">
+          <View>
+            <Label>Full name</Label>
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  placeholder="Your name"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  error={errors.name?.message}
+                />
+              )}
+            />
+          </View>
+
+          <View>
+            <Label>Phone</Label>
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  placeholder="017XXXXXXXX"
+                  keyboardType="phone-pad"
+                  autoCapitalize="none"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  error={errors.phone?.message}
+                />
+              )}
+            />
+          </View>
+
+          <View>
+            <Label>Password</Label>
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  placeholder="At least 6 characters"
+                  secureTextEntry
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  error={errors.password?.message}
+                />
+              )}
+            />
+          </View>
+
+          <Button
+            title="Register"
+            loading={isSubmitting}
+            onPress={handleSubmit(onSubmit)}
           />
+
+          <Text className="text-center font-sans text-sm text-muted">
+            Already have an account?{" "}
+            <Link href="/(auth)/login" className="font-semibold text-primary">
+              Sign in
+            </Link>
+          </Text>
         </View>
-
-        <View>
-          <Label>Phone</Label>
-          <Controller
-            control={control}
-            name="phone"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                placeholder="017XXXXXXXX"
-                keyboardType="phone-pad"
-                autoCapitalize="none"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                error={errors.phone?.message}
-              />
-            )}
-          />
-        </View>
-
-        <View>
-          <Label>Password</Label>
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                placeholder="At least 6 characters"
-                secureTextEntry
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                error={errors.password?.message}
-              />
-            )}
-          />
-        </View>
-
-        <Button
-          title="Register"
-          loading={isSubmitting}
-          onPress={handleSubmit(onSubmit)}
-        />
-
-        <Text className="text-center text-gray-600 dark:text-gray-400">
-          Already have an account?{" "}
-          <Link href="/(auth)/login" className="text-blue-600 font-semibold">
-            Sign in
-          </Link>
-        </Text>
-      </View>
+      </Card>
     </Screen>
   );
 }

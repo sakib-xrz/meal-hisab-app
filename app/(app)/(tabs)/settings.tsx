@@ -1,17 +1,21 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Image } from "expo-image";
-import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, StyleSheet, Switch, Text, View } from "react-native";
 import { Controller, useForm } from "react-hook-form";
+import { Alert, Switch, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
-import { Button, Label } from "@/components/ui/button";
+import { Avatar } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ListRow } from "@/components/ui/list-row";
 import { Screen } from "@/components/ui/screen";
+import { SectionHeader } from "@/components/ui/section-header";
+import { useAuth } from "@/context/auth-provider";
 import { ApiError } from "@/lib/api/client";
 import {
   useChangePassword,
@@ -25,7 +29,7 @@ import {
   useLeaveMess,
   useUpdateCurrentMess,
 } from "@/lib/queries/mess";
-import { useAuth } from "@/context/auth-provider";
+import * as ImagePicker from "expo-image-picker";
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -119,7 +123,8 @@ export default function SettingsScreen() {
           Toast.show({
             type: "error",
             text1: "Update failed",
-            text2: err instanceof ApiError ? err.message : "Something went wrong",
+            text2:
+              err instanceof ApiError ? err.message : "Something went wrong",
           });
         },
       },
@@ -142,7 +147,8 @@ export default function SettingsScreen() {
           Toast.show({
             type: "error",
             text1: "Password change failed",
-            text2: err instanceof ApiError ? err.message : "Something went wrong",
+            text2:
+              err instanceof ApiError ? err.message : "Something went wrong",
           });
         },
       },
@@ -166,7 +172,8 @@ export default function SettingsScreen() {
           Toast.show({
             type: "error",
             text1: "Update failed",
-            text2: err instanceof ApiError ? err.message : "Something went wrong",
+            text2:
+              err instanceof ApiError ? err.message : "Something went wrong",
           });
         },
       },
@@ -205,7 +212,8 @@ export default function SettingsScreen() {
           Toast.show({
             type: "error",
             text1: "Avatar upload failed",
-            text2: err instanceof ApiError ? err.message : "Something went wrong",
+            text2:
+              err instanceof ApiError ? err.message : "Something went wrong",
           });
         },
       },
@@ -228,7 +236,10 @@ export default function SettingsScreen() {
               Toast.show({
                 type: "error",
                 text1: "Remove failed",
-                text2: err instanceof ApiError ? err.message : "Something went wrong",
+                text2:
+                  err instanceof ApiError
+                    ? err.message
+                    : "Something went wrong",
               });
             },
           });
@@ -254,7 +265,10 @@ export default function SettingsScreen() {
               Toast.show({
                 type: "error",
                 text1: "Could not leave mess",
-                text2: err instanceof ApiError ? err.message : "Something went wrong",
+                text2:
+                  err instanceof ApiError
+                    ? err.message
+                    : "Something went wrong",
               });
             },
           });
@@ -283,7 +297,10 @@ export default function SettingsScreen() {
                 Toast.show({
                   type: "error",
                   text1: "Delete failed",
-                  text2: err instanceof ApiError ? err.message : "Something went wrong",
+                  text2:
+                    err instanceof ApiError
+                      ? err.message
+                      : "Something went wrong",
                 });
               },
             });
@@ -300,22 +317,21 @@ export default function SettingsScreen() {
 
   return (
     <Screen title="Settings">
-      <Card style={styles.section}>
-        <Text style={styles.sectionTitle}>Account</Text>
-        <Text style={styles.meta}>{user?.phone}</Text>
-        <Text style={styles.meta}>Role: {myRole ?? "—"}</Text>
+      <Card className="mb-4">
+        <SectionHeader title="Account" className="mt-0" />
+        <Text className="mb-1 font-sans text-sm text-muted">{user?.phone}</Text>
+        {myRole ? (
+          <Badge label={myRole} variant="primary" className="mb-4" />
+        ) : null}
 
-        <View style={styles.avatarRow}>
-          {user?.avatarUrl ? (
-            <Image source={{ uri: user.avatarUrl }} style={styles.avatar} />
-          ) : (
-            <View style={[styles.avatar, styles.avatarPlaceholder]}>
-              <Text style={styles.avatarInitial}>
-                {user?.name?.charAt(0)?.toUpperCase() ?? "?"}
-              </Text>
-            </View>
-          )}
-          <View style={styles.avatarActions}>
+        <View className="mb-4 flex-row items-center gap-4">
+          <Avatar
+            name={user?.name}
+            uri={user?.avatarUrl}
+            size="lg"
+            key={user?.id ?? "avatar"}
+          />
+          <View className="flex-1 gap-2">
             <Button
               title="Change photo"
               variant="secondary"
@@ -323,7 +339,11 @@ export default function SettingsScreen() {
               onPress={pickAvatar}
             />
             {user?.avatarUrl ? (
-              <Button title="Remove photo" variant="secondary" onPress={handleDeleteAvatar} />
+              <Button
+                title="Remove photo"
+                variant="ghost"
+                onPress={handleDeleteAvatar}
+              />
             ) : null}
           </View>
         </View>
@@ -341,7 +361,7 @@ export default function SettingsScreen() {
             />
           )}
         />
-        <View style={styles.gapTop}>
+        <View className="mt-3">
           <Button
             title="Save profile"
             variant="secondary"
@@ -351,14 +371,16 @@ export default function SettingsScreen() {
         </View>
       </Card>
 
-      <Card style={styles.section}>
+      <Card className="mb-4">
         <Button
-          title={showPasswordForm ? "Cancel password change" : "Change password"}
+          title={
+            showPasswordForm ? "Cancel password change" : "Change password"
+          }
           variant="secondary"
           onPress={() => setShowPasswordForm((v) => !v)}
         />
         {showPasswordForm ? (
-          <View style={styles.formBlock}>
+          <View className="mt-4 gap-3">
             <Controller
               control={passwordForm.control}
               name="currentPassword"
@@ -409,35 +431,43 @@ export default function SettingsScreen() {
       </Card>
 
       {messQuery.data ? (
-        <Card style={styles.section}>
-          <Text style={styles.sectionTitle}>Current mess</Text>
-          <Text style={styles.messName}>{messQuery.data.name}</Text>
+        <Card className="mb-4">
+          <SectionHeader title="Current mess" className="mt-0" />
+          <Text className="mb-2 font-sans text-lg font-semibold text-foreground">
+            {messQuery.data.name}
+          </Text>
           {messQuery.data.address ? (
-            <Text style={styles.meta}>{messQuery.data.address}</Text>
+            <Text className="mb-1 font-sans text-sm text-muted">
+              {messQuery.data.address}
+            </Text>
           ) : null}
           {messQuery.data.phone ? (
-            <Text style={styles.meta}>{messQuery.data.phone}</Text>
+            <Text className="mb-1 font-sans text-sm text-muted">
+              {messQuery.data.phone}
+            </Text>
           ) : null}
           {messQuery.data.owner ? (
-            <Text style={styles.meta}>Owner: {messQuery.data.owner.name}</Text>
+            <Text className="mb-2 font-sans text-sm text-muted">
+              Owner: {messQuery.data.owner.name}
+            </Text>
           ) : null}
-          <Text style={styles.meta}>
-            {messQuery.data.activeMemberCount ?? 0} active members ·{" "}
-            {messQuery.data.isActive ? "Active" : "Inactive"}
-          </Text>
+          <Badge
+            label={`${messQuery.data.activeMemberCount ?? 0} active · ${messQuery.data.isActive ? "Active" : "Inactive"}`}
+            variant="muted"
+          />
         </Card>
       ) : null}
 
       {isManagerOrAbove ? (
-        <Card style={styles.section}>
-          <Text style={styles.sectionTitle}>Mess settings</Text>
+        <Card className="mb-4">
+          <SectionHeader title="Mess settings" className="mt-0" />
           <Button
             title={showMessForm ? "Cancel" : "Edit mess"}
             variant="secondary"
             onPress={() => setShowMessForm((v) => !v)}
           />
           {showMessForm ? (
-            <View style={styles.formBlock}>
+            <View className="mt-4 gap-3">
               <Controller
                 control={messForm.control}
                 name="name"
@@ -476,13 +506,19 @@ export default function SettingsScreen() {
                   />
                 )}
               />
-              <View style={styles.switchRow}>
-                <Text style={styles.switchLabel}>Mess is active</Text>
+              <View className="flex-row items-center justify-between py-1">
+                <Text className="font-sans text-base text-foreground-secondary">
+                  Mess is active
+                </Text>
                 <Controller
                   control={messForm.control}
                   name="isActive"
                   render={({ field: { onChange, value } }) => (
-                    <Switch value={value} onValueChange={onChange} />
+                    <Switch
+                      value={value}
+                      onValueChange={onChange}
+                      trackColor={{ true: "#0d9488", false: "#e2e8f0" }}
+                    />
                   )}
                 />
               </View>
@@ -496,21 +532,27 @@ export default function SettingsScreen() {
         </Card>
       ) : null}
 
-      <Card style={styles.section}>
-        <Text style={styles.sectionTitle}>Membership</Text>
+      <Card className="mb-4">
+        <SectionHeader title="Membership" className="mt-0" />
         {isOwner ? (
-          <>
-            <Button
+          <View className="gap-3">
+            <ListRow
               title="Transfer ownership"
-              variant="secondary"
+              showChevron
               onPress={() => router.push("/(app)/settings/transfer-ownership")}
             />
-            <View style={styles.gapTop}>
-              <Button title="Delete mess" variant="danger" onPress={handleDeleteMess} />
-            </View>
-          </>
+            <Button
+              title="Delete mess"
+              variant="danger"
+              onPress={handleDeleteMess}
+            />
+          </View>
         ) : (
-          <Button title="Leave mess" variant="danger" onPress={handleLeaveMess} />
+          <Button
+            title="Leave mess"
+            variant="danger"
+            onPress={handleLeaveMess}
+          />
         )}
       </Card>
 
@@ -518,46 +560,3 @@ export default function SettingsScreen() {
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  section: { marginBottom: 16 },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111827",
-    marginBottom: 8,
-  },
-  meta: { color: "#6b7280", marginBottom: 4 },
-  messName: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#111827",
-    marginBottom: 4,
-  },
-  switchRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 4,
-  },
-  switchLabel: {
-    fontSize: 15,
-    color: "#374151",
-  },
-  avatarRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-    marginVertical: 12,
-  },
-  avatar: { width: 72, height: 72, borderRadius: 36 },
-  avatarPlaceholder: {
-    backgroundColor: "#e5e7eb",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarInitial: { fontSize: 28, fontWeight: "600", color: "#6b7280" },
-  avatarActions: { flex: 1, gap: 8 },
-  formBlock: { gap: 12, marginTop: 12 },
-  gapTop: { marginTop: 12 },
-});

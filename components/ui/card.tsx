@@ -1,19 +1,37 @@
-import { StyleSheet, View, type ViewProps } from "react-native";
+import { Text, View, type ViewProps } from "react-native";
 
-export function Card({ children, style, ...props }: ViewProps) {
+import { cn } from "@/lib/utils/cn";
+
+type CardProps = ViewProps & {
+  title?: string;
+  subtitle?: string;
+  className?: string;
+};
+
+export function Card({
+  title,
+  subtitle,
+  children,
+  className,
+  ...props
+}: CardProps) {
   return (
-    <View style={[styles.card, style]} {...props}>
+    <View
+      className={cn(
+        "rounded-2xl border border-border bg-surface p-4 shadow-sm shadow-black/5",
+        className
+      )}
+      {...props}
+    >
+      {title ? (
+        <Text className="mb-1 font-sans text-lg font-semibold text-foreground">
+          {title}
+        </Text>
+      ) : null}
+      {subtitle ? (
+        <Text className="mb-3 font-sans text-sm text-muted">{subtitle}</Text>
+      ) : null}
       {children}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-  },
-});

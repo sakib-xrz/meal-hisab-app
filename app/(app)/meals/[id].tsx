@@ -1,11 +1,15 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, View } from "react-native";
 import Toast from "react-native-toast-message";
 
-import { Button, Label } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { MealStepper } from "@/components/ui/meal-stepper";
 import { LoadingScreen, Screen } from "@/components/ui/screen";
 import { useAuth } from "@/context/auth-provider";
 import { ApiError } from "@/lib/api/client";
@@ -15,33 +19,7 @@ import {
   useMealsList,
   useUpdateMealEntry,
 } from "@/lib/queries/meals";
-import { getMonthRange } from "@/lib/utils/dates";
-
-const MEAL_OPTIONS = [0, 0.5, 1] as const;
-
-function Stepper({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: number;
-  onChange: (v: number) => void;
-}) {
-  const cycle = () => {
-    const idx = MEAL_OPTIONS.indexOf(value as (typeof MEAL_OPTIONS)[number]);
-    onChange(MEAL_OPTIONS[(idx + 1) % MEAL_OPTIONS.length]);
-  };
-
-  return (
-    <View style={styles.stepperRow}>
-      <Text style={styles.stepperLabel}>{label}</Text>
-      <Pressable onPress={cycle} style={styles.stepperBtn}>
-        <Text style={styles.stepperValue}>{value}</Text>
-      </Pressable>
-    </View>
-  );
-}
+import { formatDisplayDate, getMonthRange } from "@/lib/utils/dates";
 
 export default function EditMealEntryScreen() {
   const { id, date: dateParam } = useLocalSearchParams<{ id: string; date?: string }>();
@@ -145,8 +123,8 @@ export default function EditMealEntryScreen() {
 
   if (!isManagerOrAbove) {
     return (
-      <Screen title="Meal entry">
-        <Text style={styles.empty}>You do not have permission to edit meals.</Text>
+      <Screen edges={[]}>
+        <EmptyState title="Access denied" description="You do not have permission to edit meals." />
       </Screen>
     );
   }
@@ -157,8 +135,8 @@ export default function EditMealEntryScreen() {
 
   if (!entry) {
     return (
-      <Screen title="Meal entry">
-        <Text style={styles.empty}>Entry not found.</Text>
+      <Screen edges={[]}>
+        <EmptyState title="Not found" description="Meal entry not found." />
       </Screen>
     );
   }
@@ -167,11 +145,11 @@ export default function EditMealEntryScreen() {
 
   return (
     <Screen
-      title="Edit meal"
-      subtitle={`${entry.mealDate} · ${entry.member.fullName}`}
+      edges={[]}
+      subtitle={`${formatDisplayDate(entry.mealDate)} · ${entry.member.fullName}`}
       keyboardAvoid
       footer={
-        <View style={styles.footer}>
+        <View className="gap-3">
           <Button title="Save changes" loading={saveMutation.isPending} onPress={handleSave} />
           <Button title="Delete entry" variant="danger" onPress={handleDelete} />
         </View>
@@ -187,45 +165,24 @@ export default function EditMealEntryScreen() {
         />
       ) : null}
 
-      <Stepper label="Breakfast" value={breakfast} onChange={setBreakfast} />
-      <Stepper label="Lunch" value={lunch} onChange={setLunch} />
-      <Stepper label="Dinner" value={dinner} onChange={setDinner} />
+      <Card className="mb-4">
+        <View className="flex-row justify-between px-2">
+          <MealStepper label="Breakfast" value={breakfast} onChange={setBreakfast} />
+          <MealStepper label="Lunch" value={lunch} onChange={setLunch} />
+          <MealStepper label="Dinner" value={dinner} onChange={setDinner} />
+        </View>
+      </Card>
 
-      <View style={styles.noteField}>
+      <View>
         <Label>Note</Label>
         <Input
           placeholder="Optional note"
           value={note}
           onChangeText={setNote}
           multiline
+          className="min-h-[80px]"
         />
       </View>
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  stepperRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 16,
-  },
-  stepperLabel: { fontSize: 16, color: "#374151" },
-  stepperBtn: {
-    width: 48,
-    height: 48,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#93c5fd",
-    backgroundColor: "#eff6ff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  stepperValue: { fontSize: 16, fontWeight: "600", color: "#111827" },
-  noteField: {
-    marginTop: 8,
-  },
-  footer: { gap: 12 },
-  empty: { color: "#6b7280", textAlign: "center", paddingVertical: 32 },
-});

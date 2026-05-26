@@ -58,3 +58,26 @@ export function getApiBaseUrl(): string {
 export function getApiBaseUrlForDisplay(): string {
   return getApiBaseUrl();
 }
+
+/** Public CDN/base URL for R2-backed assets (avatars, receipts, etc.). */
+export function getAssetsBaseUrl(): string | null {
+  const fromEnv = process.env.EXPO_PUBLIC_ASSETS_URL?.replace(/\/$/, "");
+  if (fromEnv) return fromEnv;
+
+  const apiBase = getApiBaseUrl();
+  try {
+    const apiUrl = new URL(apiBase);
+    if (apiUrl.hostname.includes("-api.")) {
+      apiUrl.hostname = apiUrl.hostname.replace("-api.", "-assets.");
+      return apiUrl.origin;
+    }
+  } catch {
+    // ignore
+  }
+
+  return null;
+}
+
+export function getAssetsBaseUrlForDisplay(): string | null {
+  return getAssetsBaseUrl();
+}

@@ -1,18 +1,21 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { Input } from "@/components/ui/input";
 import { Screen } from "@/components/ui/screen";
 import { SegmentControl } from "@/components/ui/segment-control";
 import { useAuth } from "@/context/auth-provider";
 import { ApiError } from "@/lib/api/client";
-import type { Member, MemberStatus } from "@/lib/api/types";
+import type { Member, MemberStatus, RoleKey } from "@/lib/api/types";
 import { useMembers, useRemoveMember } from "@/lib/queries/members";
+import { formatShortDate } from "@/lib/utils/dates";
 
 type StatusFilter = MemberStatus | "ALL";
 
@@ -22,6 +25,18 @@ const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
   { value: "LEFT", label: "Left" },
   { value: "ALL", label: "All" },
 ];
+
+function roleBadgeVariant(role: RoleKey) {
+  if (role === "OWNER") return "accent" as const;
+  if (role === "MANAGER") return "primary" as const;
+  return "muted" as const;
+}
+
+function statusBadgeVariant(status: MemberStatus) {
+  if (status === "ACTIVE") return "primary" as const;
+  if (status === "LEFT") return "danger" as const;
+  return "muted" as const;
+}
 
 function canManageMember(member: Member) {
   return member.status === "ACTIVE" && member.roleKey !== "OWNER";
@@ -78,12 +93,13 @@ export default function MembersScreen() {
         isManagerOrAbove ? (
           <Button
             title="Add member"
+            size="lg"
             onPress={() => router.push("/(app)/members/add")}
           />
         ) : undefined
       }
     >
-      <View style={styles.filters}>
+      <View className="mb-4 gap-3">
         <SegmentControl
           options={STATUS_FILTERS}
           value={statusFilter}
@@ -107,43 +123,49 @@ export default function MembersScreen() {
         />
       ) : null}
 
-      <View style={styles.list}>
+      <View className="gap-3">
         {members.map((member) => (
-          <Card key={member.id} style={styles.card}>
-            <View style={styles.row}>
-              <View style={styles.info}>
-                <Text style={styles.name}>{member.fullName}</Text>
-                <Text style={styles.meta}>
-                  {member.roleKey} · {member.status}
-                  {member.roomNo ? ` · Room ${member.roomNo}` : ""}
-                </Text>
-                {member.phone ? (
-                  <Text style={styles.meta}>{member.phone}</Text>
-                ) : null}
-                {member.email ? (
-                  <Text style={styles.meta}>{member.email}</Text>
-                ) : null}
-                {member.joiningDate ? (
-                  <Text style={styles.meta}>Joined {member.joiningDate}</Text>
-                ) : null}
-              </View>
+          <Card key={member.id}>
+            <View className="mb-2 flex-row flex-wrap items-center gap-2">
+              <Text className="flex-1 font-sans text-base font-semibold text-foreground">
+                {member.fullName}
+              </Text>
+              <Badge label={member.roleKey} variant={roleBadgeVariant(member.roleKey)} />
+              <Badge label={member.status} variant={statusBadgeVariant(member.status)} />
             </View>
 
+            {member.roomNo ? (
+              <Text className="font-sans text-sm text-muted">Room {member.roomNo}</Text>
+            ) : null}
+            {member.phone ? (
+              <Text className="font-sans text-sm text-muted">{member.phone}</Text>
+            ) : null}
+            {member.email ? (
+              <Text className="font-sans text-sm text-muted">{member.email}</Text>
+            ) : null}
+            {member.joiningDate ? (
+              <Text className="font-sans text-sm text-muted">
+                Joined {formatShortDate(member.joiningDate)}
+              </Text>
+            ) : null}
+
             {isManagerOrAbove ? (
-              <View style={styles.actions}>
+              <View className="mt-3 flex-row gap-4 border-t border-border pt-3">
                 <Pressable
-                  style={styles.actionBtn}
                   onPress={() => router.push(`/(app)/members/${member.id}`)}
+                  hitSlop={8}
                 >
-                  <Text style={styles.editAction}>Edit</Text>
+                  <Text className="font-sans text-sm font-semibold text-primary">Edit</Text>
                 </Pressable>
                 {canManageMember(member) ? (
                   <Pressable
-                    style={styles.actionBtn}
                     onPress={() => handleRemove(member)}
                     disabled={removeMutation.isPending}
+                    hitSlop={8}
                   >
-                    <Text style={styles.removeAction}>Remove</Text>
+                    <Text className="font-sans text-sm font-semibold text-danger">
+                      Remove
+                    </Text>
                   </Pressable>
                 ) : null}
               </View>
@@ -153,70 +175,21 @@ export default function MembersScreen() {
       </View>
 
       {membersQuery.isSuccess && members.length === 0 ? (
-        <Text style={styles.empty}>
-          No members match this filter.
-          {isManagerOrAbove && statusFilter === "ACTIVE"
-            ? " Add your first member."
-            : ""}
-        </Text>
+        <EmptyState
+          title="No members found"
+          description={
+            isManagerOrAbove && statusFilter === "ACTIVE"
+              ? "Add your first member to get started."
+              : "No members match this filter."
+          }
+          actionLabel={isManagerOrAbove ? "Add member" : undefined}
+          onAction={
+            isManagerOrAbove
+              ? () => router.push("/(app)/members/add")
+              : undefined
+          }
+        />
       ) : null}
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  filters: {
-    gap: 12,
-    marginBottom: 16,
-  },
-  list: {
-    gap: 12,
-  },
-  card: {
-    marginBottom: 0,
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  info: {
-    flex: 1,
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111827",
-  },
-  meta: {
-    color: "#6b7280",
-    fontSize: 14,
-    marginTop: 2,
-  },
-  actions: {
-    flexDirection: "row",
-    gap: 16,
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#f3f4f6",
-  },
-  actionBtn: {
-    paddingVertical: 4,
-  },
-  editAction: {
-    color: "#2563eb",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  removeAction: {
-    color: "#dc2626",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  empty: {
-    color: "#6b7280",
-    textAlign: "center",
-    paddingVertical: 32,
-  },
-});
