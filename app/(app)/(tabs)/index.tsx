@@ -37,7 +37,6 @@ export default function DashboardScreen() {
 
   return (
     <Screen
-      tabScreen
       contentClassName="pt-4"
       refreshing={isRefreshing}
       onRefresh={refetch}

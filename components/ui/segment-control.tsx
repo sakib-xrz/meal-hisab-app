@@ -10,8 +10,6 @@ import { cn } from "@/lib/utils/cn";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-
-
 type SegmentOption<T extends string> = {
   value: T;
   label: string;
@@ -57,7 +55,7 @@ export function SegmentControl<T extends string>({
       {/* Animated sliding indicator */}
       <Animated.View
         style={indicatorStyle}
-        className="absolute bottom-1 top-1 rounded-lg bg-surface shadow-sm shadow-black/8"
+        className="absolute bottom-1 top-1 rounded-full bg-surface shadow-sm shadow-black/8"
       />
 
       {options.map((option) => {
@@ -67,7 +65,7 @@ export function SegmentControl<T extends string>({
             key={option.value}
             onPress={() => !disabled && onChange(option.value)}
             className={cn(
-              "z-10 min-h-10 flex-1 items-center justify-center rounded-lg px-3 py-2",
+              "z-10 min-h-8 flex-1 items-center justify-center rounded-lg",
               disabled && "opacity-50",
             )}
             accessibilityRole="button"

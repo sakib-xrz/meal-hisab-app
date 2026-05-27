@@ -95,7 +95,6 @@ export default function MembersScreen() {
   return (
     <>
       <Screen
-      tabScreen
       title="Members"
       subtitle={`${members.length} member${members.length === 1 ? "" : "s"}`}
       refreshing={membersQuery.isRefetching}

@@ -317,7 +317,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <Screen tabScreen title="Settings">
+    <Screen title="Settings">
       <FadeIn delay={50}>
         <Card variant="glass" className="mb-4">
           <View className="mb-4 flex-row items-center gap-4">

@@ -1,6 +1,4 @@
 import { Tabs } from "expo-router";
-import { Platform, StyleSheet, View } from "react-native";
-import { BlurView } from "expo-blur";
 
 import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
@@ -17,35 +15,13 @@ export default function TabLayout() {
         tabBarInactiveTintColor: Colors[colorScheme ?? "light"].tabIconDefault,
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarBackground: () => (
-          <View style={{ borderRadius: 24, overflow: "hidden", ...StyleSheet.absoluteFillObject }}>
-            <BlurView
-              intensity={90}
-              tint={colorScheme === "dark" ? "dark" : "light"}
-              style={StyleSheet.absoluteFill}
-            />
-          </View>
-        ),
         tabBarStyle: {
-          position: "absolute",
-          bottom: Platform.OS === "ios" ? 28 : 16,
-          left: 16,
-          right: 16,
-          height: 64,
-          borderRadius: 24,
-          backgroundColor: colorScheme === "dark" ? "rgba(11, 22, 20, 0.65)" : "rgba(255, 255, 252, 0.65)",
-          borderWidth: 1,
-          borderColor: colorScheme === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(219, 229, 220, 0.55)",
-          elevation: 8,
-          shadowColor: "#16201f",
-          shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: colorScheme === "dark" ? 0.3 : 0.08,
-          shadowRadius: 16,
+          backgroundColor: colorScheme === "dark" ? "#0b1614" : "#f5f8f2",
+          borderTopWidth: 1,
+          borderTopColor: Brand.border,
           paddingTop: 8,
-          paddingBottom: 8,
         },
         tabBarItemStyle: {
-          borderRadius: 8,
           marginHorizontal: 3,
         },
         tabBarLabelStyle: {

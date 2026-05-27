@@ -239,7 +239,6 @@ export default function MealsScreen() {
   return (
     <>
       <Screen
-        tabScreen
         title="Daily meals"
         subtitle={formatDisplayDate(date)}
         refreshing={sheetQuery.isRefetching}

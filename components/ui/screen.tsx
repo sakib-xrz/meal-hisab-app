@@ -26,7 +26,6 @@ type ScreenProps = ScrollViewProps & {
   footer?: React.ReactNode;
   contentClassName?: string;
   edges?: ("top" | "bottom" | "left" | "right")[];
-  tabScreen?: boolean;
 };
 
 function getGreeting(): string {
@@ -50,10 +49,8 @@ export function Screen({
   contentClassName,
   className,
   edges = ["top"],
-  tabScreen = false,
   ...props
 }: ScreenProps) {
-  const isIos = Platform.OS === "ios";
   const content = (
     <ScrollView
       style={styles.flex}
@@ -77,7 +74,6 @@ export function Screen({
       <View
         className={cn(
           "px-4 pb-8 pt-2",
-          tabScreen && !footer && (isIos ? "pb-28" : "pb-24"),
           contentClassName,
         )}
       >
@@ -128,10 +124,7 @@ export function Screen({
         content
       )}
       {footer ? (
-        <View
-          style={tabScreen ? { paddingBottom: isIos ? 32 : 16 } : undefined}
-          className="border-t border-border/50 bg-surface px-4 pb-4 pt-3 shadow-lg shadow-foreground/5"
-        >
+        <View className="border-t border-border/50 bg-surface px-4 pb-4 pt-3 shadow-lg shadow-foreground/5">
           {footer}
         </View>
       ) : null}
