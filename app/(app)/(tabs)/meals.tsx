@@ -251,7 +251,7 @@ export default function MealsScreen() {
               loading={saveMutation.isPending}
               disabled={!dirty}
               onPress={handleSave}
-              className="mb-20"
+              className="mb-16"
             />
           ) : undefined
         }

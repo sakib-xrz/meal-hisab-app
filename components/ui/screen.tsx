@@ -73,7 +73,7 @@ export function Screen({
     >
       <View
         className={cn("px-4 pt-2", contentClassName)}
-        style={{ paddingBottom: footer ? 24 : 100 }}
+        style={{ paddingBottom: footer ? 24 : 90 }}
       >
         {hero}
 
