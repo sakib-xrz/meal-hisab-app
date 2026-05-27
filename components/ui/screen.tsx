@@ -1,5 +1,3 @@
-import { BottomTabBarHeightContext } from "@react-navigation/bottom-tabs";
-import { useContext } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -53,8 +51,6 @@ export function Screen({
   edges = ["top"],
   ...props
 }: ScreenProps) {
-  const tabBarHeight = useContext(BottomTabBarHeightContext) ?? 0;
-
   const content = (
     <ScrollView
       style={styles.flex}
@@ -77,7 +73,7 @@ export function Screen({
     >
       <View
         className={cn("px-4 pt-2", contentClassName)}
-        style={{ paddingBottom: 24 + tabBarHeight }}
+        style={{ paddingBottom: footer ? 24 : 100 }}
       >
         {hero}
 
@@ -85,7 +81,8 @@ export function Screen({
         {greeting ? (
           <View className="mb-1 mt-3">
             <Text className="font-sans text-base text-muted">
-              {getGreeting()}{greeting.name ? "," : ""} 👋
+              {getGreeting()}
+              {greeting.name ? "," : ""} 👋
             </Text>
             {greeting.name ? (
               <Text className="mt-0.5 font-sans text-2xl font-bold text-foreground">
@@ -113,7 +110,11 @@ export function Screen({
   );
 
   return (
-    <SafeAreaView style={styles.flex} className="flex-1 bg-background" edges={edges}>
+    <SafeAreaView
+      style={styles.flex}
+      className="flex-1 bg-background"
+      edges={edges}
+    >
       {keyboardAvoid ? (
         <KeyboardAvoidingView
           style={styles.flex}

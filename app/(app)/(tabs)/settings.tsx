@@ -6,6 +6,7 @@ import { Alert, Switch, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
+import { FadeIn } from "@/components/ui/animated-view";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,6 @@ import { Label } from "@/components/ui/label";
 import { ListRow } from "@/components/ui/list-row";
 import { Screen } from "@/components/ui/screen";
 import { SectionHeader } from "@/components/ui/section-header";
-import { FadeIn } from "@/components/ui/animated-view";
 import { useAuth } from "@/context/auth-provider";
 import { ApiError } from "@/lib/api/client";
 import {
@@ -349,8 +349,8 @@ export default function SettingsScreen() {
           <View className="mb-4 flex-row gap-2">
             <View className="flex-1">
               <Button
-                title="Change photo"
-                variant="secondary"
+                title="Change"
+                variant="primary"
                 leftIcon="photo-camera"
                 loading={updateAvatarMutation.isPending}
                 onPress={pickAvatar}
@@ -360,7 +360,7 @@ export default function SettingsScreen() {
               <View className="flex-1">
                 <Button
                   title="Remove"
-                  variant="ghost"
+                  variant="danger"
                   leftIcon="delete-outline"
                   onPress={handleDeleteAvatar}
                 />
@@ -441,7 +441,9 @@ export default function SettingsScreen() {
                     value={value}
                     onChangeText={onChange}
                     onBlur={onBlur}
-                    error={passwordForm.formState.errors.confirmPassword?.message}
+                    error={
+                      passwordForm.formState.errors.confirmPassword?.message
+                    }
                   />
                 )}
               />
@@ -572,7 +574,9 @@ export default function SettingsScreen() {
               <ListRow
                 title="Transfer ownership"
                 showChevron
-                onPress={() => router.push("/(app)/settings/transfer-ownership")}
+                onPress={() =>
+                  router.push("/(app)/settings/transfer-ownership")
+                }
               />
               <Button
                 title="Delete mess"

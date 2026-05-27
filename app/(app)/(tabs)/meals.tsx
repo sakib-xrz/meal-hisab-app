@@ -49,7 +49,6 @@ function MealRow({
 }) {
   const hasEntry = Boolean(row.mealEntryId);
   const hasMeals = row.breakfast > 0 || row.lunch > 0 || row.dinner > 0;
-  console.log(row);
 
   return (
     <View className="border-b border-border/50 py-4 last:border-b-0">
@@ -358,7 +357,7 @@ export default function MealsScreen() {
           </FadeIn>
         ) : null}
 
-        <FadeIn delay={200} className="gap-3 mb-6">
+        <FadeIn delay={200} className="gap-3">
           <Link href="/(app)/meals/history" asChild>
             <ActionRow
               title="View all meal history"
