@@ -67,7 +67,9 @@ export function Screen({
           </Text>
         ) : null}
         {subtitle ? (
-          <Text className="mb-4 font-sans text-base text-muted">{subtitle}</Text>
+          <Text className="mb-4 font-sans text-base text-muted">
+            {subtitle}
+          </Text>
         ) : null}
         {children}
       </View>
@@ -95,9 +97,16 @@ export function Screen({
   );
 }
 
-export function LoadingScreen({ message = "Loading..." }: { message?: string }) {
+export function LoadingScreen({
+  message = "Loading...",
+}: {
+  message?: string;
+}) {
   return (
-    <SafeAreaView style={styles.safe} className="items-center justify-center bg-background">
+    <SafeAreaView
+      style={styles.safe}
+      className="items-center justify-center bg-background"
+    >
       <ActivityIndicator size="large" color="#0d9488" />
       <Text className="mt-3 font-sans text-base text-muted">{message}</Text>
     </SafeAreaView>

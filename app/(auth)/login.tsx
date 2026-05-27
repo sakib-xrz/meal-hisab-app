@@ -5,15 +5,14 @@ import { Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
 import { BrandHero } from "@/components/ui/brand-hero";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Screen } from "@/components/ui/screen";
 import { useAuth } from "@/context/auth-provider";
 import { ApiError } from "@/lib/api/client";
-import { getApiBaseUrlForDisplay } from "@/lib/api/config";
 
 const schema = z.object({
   phone: z.string().min(10, "Enter a valid phone number"),
@@ -64,7 +63,7 @@ export default function LoginScreen() {
               name="phone"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  placeholder="017XXXXXXXX"
+                  placeholder="Enter your phone number"
                   keyboardType="phone-pad"
                   autoCapitalize="none"
                   value={value}
@@ -83,7 +82,8 @@ export default function LoginScreen() {
               name="password"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  placeholder="Password"
+                  placeholder="Enter your password"
+                  passwordToggle
                   secureTextEntry
                   value={value}
                   onChangeText={onChange}
@@ -94,20 +94,21 @@ export default function LoginScreen() {
             />
           </View>
 
-          <Button title="Sign In" loading={isSubmitting} onPress={handleSubmit(onSubmit)} />
+          <Button
+            title="Sign In"
+            loading={isSubmitting}
+            onPress={handleSubmit(onSubmit)}
+          />
 
           <Text className="text-center font-sans text-sm text-muted">
             No account?{" "}
-            <Link href="/(auth)/register" className="font-semibold text-primary">
+            <Link
+              href="/(auth)/register"
+              className="font-semibold text-primary"
+            >
               Register
             </Link>
           </Text>
-
-          {__DEV__ ? (
-            <Text className="text-center font-sans text-xs text-muted">
-              API: {getApiBaseUrlForDisplay()}
-            </Text>
-          ) : null}
         </View>
       </Card>
     </Screen>

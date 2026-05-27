@@ -5,8 +5,8 @@ import { Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
 import { BrandHero } from "@/components/ui/brand-hero";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,7 +57,7 @@ export default function RegisterScreen() {
               name="name"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  placeholder="Your name"
+                  placeholder="Enter your full name"
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -74,7 +74,7 @@ export default function RegisterScreen() {
               name="phone"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  placeholder="017XXXXXXXX"
+                  placeholder="Enter your phone number"
                   keyboardType="phone-pad"
                   autoCapitalize="none"
                   value={value}
@@ -93,7 +93,8 @@ export default function RegisterScreen() {
               name="password"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  placeholder="At least 6 characters"
+                  placeholder="Enter your password"
+                  passwordToggle
                   secureTextEntry
                   value={value}
                   onChangeText={onChange}
