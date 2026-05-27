@@ -49,7 +49,7 @@ function MealRow({
 }) {
   const hasEntry = Boolean(row.mealEntryId);
   const hasMeals = row.breakfast > 0 || row.lunch > 0 || row.dinner > 0;
-  const total = row.breakfast + row.lunch + row.dinner;
+  console.log(row);
 
   return (
     <View className="border-b border-border/50 py-4 last:border-b-0">
@@ -68,11 +68,6 @@ function MealRow({
             </Text>
           </View>
         </View>
-        <Badge
-          label={`${total} meal${total === 1 ? "" : "s"}`}
-          variant={hasMeals ? "primary" : "muted"}
-          pill
-        />
         {!readOnly && hasEntry ? (
           <View className="ml-2 flex-row gap-2">
             <Pressable
@@ -242,132 +237,145 @@ export default function MealsScreen() {
     sheetQuery.isLoading || (sheetQuery.isFetching && !sheetReady);
 
   return (
-    <Screen
-      tabScreen
-      title="Daily meals"
-      subtitle={formatDisplayDate(date)}
-      refreshing={sheetQuery.isRefetching}
-      onRefresh={() => sheetQuery.refetch()}
-      contentClassName="pt-2"
-      footer={
-        isManagerOrAbove ? (
-          <Button
-            title="Save sheet"
-            size="lg"
-            loading={saveMutation.isPending}
-            disabled={!dirty}
-            onPress={handleSave}
-          />
-        ) : undefined
-      }
-    >
-      {/* Date Switcher Glass Card */}
-      <Card
-        variant="glass"
-        className="mb-5 flex-row items-center justify-between p-2 shadow-sm"
+    <>
+      <Screen
+        tabScreen
+        title="Daily meals"
+        subtitle={formatDisplayDate(date)}
+        refreshing={sheetQuery.isRefetching}
+        onRefresh={() => sheetQuery.refetch()}
+        contentClassName="pt-2"
+        footer={
+          isManagerOrAbove ? (
+            <Button
+              title="Save sheet"
+              size="lg"
+              loading={saveMutation.isPending}
+              disabled={!dirty}
+              onPress={handleSave}
+            />
+          ) : undefined
+        }
       >
-        <Button
-          title="Prev"
-          leftIcon="chevron-left"
-          variant="ghost"
-          className="px-3 py-2"
-          onPress={() => setDate((d) => shiftDate(d, -1))}
-        />
-        <Button
-          title="Today"
-          variant="secondary"
-          className="px-4 py-2"
-          onPress={() => setDate(todayApiDate())}
-        />
-        <Button
-          title="Next"
-          rightIcon="chevron-right"
-          variant="ghost"
-          className="px-3 py-2"
-          onPress={() => setDate((d) => shiftDate(d, 1))}
-        />
-      </Card>
-
-      {sheetQuery.error ? (
-        <ErrorState
-          message={
-            sheetQuery.error instanceof Error
-              ? sheetQuery.error.message
-              : "Failed to load"
-          }
-          onRetry={() => sheetQuery.refetch()}
-        />
-      ) : null}
-
-      {showSkeleton ? (
-        <Card className="mb-5 p-4">
-          <StaggerList staggerMs={80}>
-            <ShimmerMealRow />
-            <ShimmerMealRow />
-            <ShimmerMealRow />
-          </StaggerList>
+        {/* Date Switcher Glass Card */}
+        <Card
+          variant="glass"
+          className="mb-5 flex-row items-center justify-between p-2 shadow-sm"
+        >
+          <Button
+            title="Prev"
+            leftIcon="chevron-left"
+            variant="ghost"
+            className="px-3 py-2"
+            onPress={() => setDate((d) => shiftDate(d, -1))}
+          />
+          <Button
+            title="Today"
+            variant="secondary"
+            className="px-4 py-2"
+            onPress={() => setDate(todayApiDate())}
+          />
+          <Button
+            title="Next"
+            rightIcon="chevron-right"
+            variant="ghost"
+            className="px-3 py-2"
+            onPress={() => setDate((d) => shiftDate(d, 1))}
+          />
         </Card>
-      ) : rows.length > 0 ? (
-        <FadeIn delay={50}>
+
+        {sheetQuery.error ? (
+          <ErrorState
+            message={
+              sheetQuery.error instanceof Error
+                ? sheetQuery.error.message
+                : "Failed to load"
+            }
+            onRetry={() => sheetQuery.refetch()}
+          />
+        ) : null}
+
+        {showSkeleton ? (
           <Card className="mb-5 p-4">
-            <StaggerList staggerMs={50}>
-              {rows.map((row) => (
-                <MealRow
-                  key={row.memberId}
-                  row={row}
-                  readOnly={!isManagerOrAbove}
-                  onChange={(field, value) =>
-                    updateRow(row.memberId, field, value)
-                  }
-                  onEdit={handleEditEntry}
-                  onDelete={handleDeleteEntry}
-                />
-              ))}
+            <StaggerList staggerMs={80}>
+              <ShimmerMealRow />
+              <ShimmerMealRow />
+              <ShimmerMealRow />
             </StaggerList>
           </Card>
-        </FadeIn>
-      ) : sheetQuery.isSuccess && sheetReady ? (
-        <EmptyState
-          title="No members on this sheet"
-          description="Add active members to start tracking meals."
-        />
-      ) : null}
-
-      {summary ? (
-        <FadeIn delay={150}>
-          <Card title="Day total" className="mb-5 p-4">
-            <View className="flex-row flex-wrap gap-2 pt-1">
-              <Badge
-                label={`Breakfast ${summary.breakfast}`}
-                variant="muted"
-                pill
-              />
-              <Badge label={`Lunch ${summary.lunch}`} variant="primary" pill />
-              <Badge label={`Dinner ${summary.dinner}`} variant="accent" pill />
-              <Badge label={`Total ${summary.total}`} variant="default" pill />
-            </View>
-          </Card>
-        </FadeIn>
-      ) : null}
-
-      <FadeIn delay={200} className="gap-3 mb-6">
-        <Link href="/(app)/meals/history" asChild>
-          <ActionRow
-            title="View all meal history"
-            subtitle="Past entries"
-            icon="history"
+        ) : rows.length > 0 ? (
+          <FadeIn delay={50}>
+            <Card className="mb-5 p-4">
+              <StaggerList staggerMs={50}>
+                {rows.map((row) => (
+                  <MealRow
+                    key={row.memberId}
+                    row={row}
+                    readOnly={!isManagerOrAbove}
+                    onChange={(field, value) =>
+                      updateRow(row.memberId, field, value)
+                    }
+                    onEdit={handleEditEntry}
+                    onDelete={handleDeleteEntry}
+                  />
+                ))}
+              </StaggerList>
+            </Card>
+          </FadeIn>
+        ) : sheetQuery.isSuccess && sheetReady ? (
+          <EmptyState
+            title="No members on this sheet"
+            description="Add active members to start tracking meals."
           />
-        </Link>
-        <Link href="/(app)/meals/summary" asChild>
-          <ActionRow
-            title="Monthly summary"
-            subtitle="Totals by member and date"
-            icon="analytics"
-            tone="accent"
-          />
-        </Link>
-      </FadeIn>
+        ) : null}
 
+        {summary ? (
+          <FadeIn delay={150}>
+            <Card title="Day total" className="mb-5 p-4">
+              <View className="flex-row flex-wrap gap-2 pt-1">
+                <Badge
+                  label={`Breakfast ${summary.breakfast}`}
+                  variant="muted"
+                  pill
+                />
+                <Badge
+                  label={`Lunch ${summary.lunch}`}
+                  variant="primary"
+                  pill
+                />
+                <Badge
+                  label={`Dinner ${summary.dinner}`}
+                  variant="accent"
+                  pill
+                />
+                <Badge
+                  label={`Total ${summary.total}`}
+                  variant="default"
+                  pill
+                />
+              </View>
+            </Card>
+          </FadeIn>
+        ) : null}
+
+        <FadeIn delay={200} className="gap-3 mb-6">
+          <Link href="/(app)/meals/history" asChild>
+            <ActionRow
+              title="View all meal history"
+              subtitle="Past entries"
+              icon="history"
+            />
+          </Link>
+          <Link href="/(app)/meals/summary" asChild>
+            <ActionRow
+              title="Monthly summary"
+              subtitle="Totals by member and date"
+              icon="analytics"
+              tone="accent"
+            />
+          </Link>
+        </FadeIn>
+      </Screen>
       <ConfirmSheet
         sheetRef={deleteSheet.ref}
         title="Delete meal entry"
@@ -381,6 +389,6 @@ export default function MealsScreen() {
         loading={deleteMutation.isPending}
         onConfirm={confirmDelete}
       />
-    </Screen>
+    </>
   );
 }

@@ -1,4 +1,3 @@
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as Haptics from "expo-haptics";
 import { Platform, Pressable, Text, View } from "react-native";
 import Animated, {
@@ -54,7 +53,9 @@ export function MealStepper({
   return (
     <View className={cn("items-center", className)}>
       {label ? (
-        <Text className="mb-2 font-sans text-xs font-semibold tracking-wide text-muted">{label}</Text>
+        <Text className="mb-2 font-sans text-xs font-semibold tracking-wide text-muted">
+          {label}
+        </Text>
       ) : null}
       <AnimatedPressable
         style={animatedStyle}
@@ -68,13 +69,10 @@ export function MealStepper({
               : "border-border bg-surface",
         )}
         accessibilityRole="button"
-        accessibilityLabel={label ? `${label} meal count ${current}` : `Meal count ${current}`}
+        accessibilityLabel={
+          label ? `${label} meal count ${current}` : `Meal count ${current}`
+        }
       >
-        <MaterialIcons
-          name={current > 0 ? "check" : "add"}
-          size={18}
-          color={current > 0 ? "#0b4f4a" : "#8b9894"}
-        />
         <Text
           className={cn(
             "ml-1 font-sans text-lg font-bold",

@@ -154,7 +154,8 @@ export default function EditMealEntryScreen() {
   const queryError = listQuery.error ?? dailyQuery.error;
 
   return (
-    <Screen
+    <>
+      <Screen
       edges={[]}
       subtitle={`${formatDisplayDate(entry.mealDate)} - ${entry.member.fullName}`}
       keyboardAvoid
@@ -214,6 +215,7 @@ export default function EditMealEntryScreen() {
         </View>
       </FadeIn>
 
+    </Screen>
       <ConfirmSheet
         sheetRef={deleteSheet.ref}
         title="Delete meal entry"
@@ -223,6 +225,6 @@ export default function EditMealEntryScreen() {
         loading={deleteMutation.isPending}
         onConfirm={confirmDelete}
       />
-    </Screen>
+    </>
   );
 }

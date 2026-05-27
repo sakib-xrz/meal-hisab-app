@@ -173,7 +173,8 @@ export default function EditMemberScreen() {
   }
 
   return (
-    <Screen
+    <>
+      <Screen
       edges={[]}
       subtitle={isLeft ? "This member has left" : undefined}
       keyboardAvoid
@@ -340,6 +341,7 @@ export default function EditMemberScreen() {
         </StaggerList>
       </Card>
 
+    </Screen>
       <ConfirmSheet
         sheetRef={removeSheet.ref}
         title="Remove member"
@@ -349,6 +351,6 @@ export default function EditMemberScreen() {
         loading={removeMutation.isPending}
         onConfirm={confirmRemove}
       />
-    </Screen>
+    </>
   );
 }

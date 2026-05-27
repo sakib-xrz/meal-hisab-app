@@ -93,7 +93,8 @@ export default function MembersScreen() {
     membersQuery.isLoading || (membersQuery.isFetching && members.length === 0);
 
   return (
-    <Screen
+    <>
+      <Screen
       tabScreen
       title="Members"
       subtitle={`${members.length} member${members.length === 1 ? "" : "s"}`}
@@ -262,6 +263,7 @@ export default function MembersScreen() {
         />
       ) : null}
 
+    </Screen>
       <ConfirmSheet
         sheetRef={removeSheet.ref}
         title="Remove member"
@@ -275,6 +277,6 @@ export default function MembersScreen() {
         loading={removeMutation.isPending}
         onConfirm={confirmRemove}
       />
-    </Screen>
+    </>
   );
 }

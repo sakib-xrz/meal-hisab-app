@@ -3,10 +3,10 @@ import type { ComponentProps } from "react";
 import { useEffect } from "react";
 import { Text, View, type ViewProps } from "react-native";
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-  Easing,
 } from "react-native-reanimated";
 
 import { cn } from "@/lib/utils/cn";
@@ -23,7 +23,10 @@ type MetricTileProps = ViewProps & {
   className?: string;
 };
 
-const toneClasses: Record<MetricTone, { tile: string; icon: string; iconColor: string }> = {
+const toneClasses: Record<
+  MetricTone,
+  { tile: string; icon: string; iconColor: string }
+> = {
   primary: {
     tile: "border-primary-soft/70 bg-primary-soft/40",
     icon: "bg-primary",
@@ -66,8 +69,14 @@ export function MetricTile({
 
   useEffect(() => {
     if (animated) {
-      opacity.value = withTiming(1, { duration: 500, easing: Easing.out(Easing.ease) });
-      translateY.value = withTiming(0, { duration: 500, easing: Easing.out(Easing.ease) });
+      opacity.value = withTiming(1, {
+        duration: 500,
+        easing: Easing.out(Easing.ease),
+      });
+      translateY.value = withTiming(0, {
+        duration: 500,
+        easing: Easing.out(Easing.ease),
+      });
     }
   }, [animated, opacity, translateY]);
 
@@ -91,12 +100,20 @@ export function MetricTile({
           {label}
         </Text>
         {icon ? (
-          <View className={cn("h-9 w-9 items-center justify-center rounded-xl", classes.icon)}>
+          <View
+            className={cn(
+              "h-9 w-9 items-center justify-center rounded-xl",
+              classes.icon,
+            )}
+          >
             <MaterialIcons name={icon} size={18} color={classes.iconColor} />
           </View>
         ) : null}
       </View>
-      <Text className="font-sans text-2xl font-bold text-foreground" numberOfLines={1}>
+      <Text
+        className="font-sans text-xl font-bold text-foreground"
+        numberOfLines={1}
+      >
         {value}
       </Text>
     </Animated.View>

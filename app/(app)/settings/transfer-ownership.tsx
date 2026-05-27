@@ -68,7 +68,8 @@ export default function TransferOwnershipScreen() {
     membersQuery.data?.filter((m) => m.roleKey !== "OWNER") ?? [];
 
   return (
-    <Screen
+    <>
+      <Screen
       edges={[]}
       subtitle="Select a member with a linked app account"
       refreshing={membersQuery.isRefetching}
@@ -132,6 +133,7 @@ export default function TransferOwnershipScreen() {
         />
       ) : null}
 
+    </Screen>
       <ConfirmSheet
         sheetRef={transferSheet.ref}
         title="Transfer ownership"
@@ -145,6 +147,6 @@ export default function TransferOwnershipScreen() {
         loading={transferMutation.isPending}
         onConfirm={handleConfirmTransfer}
       />
-    </Screen>
+    </>
   );
 }

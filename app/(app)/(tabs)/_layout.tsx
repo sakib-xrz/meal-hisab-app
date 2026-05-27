@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Platform, StyleSheet } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { BlurView } from "expo-blur";
 
 import { HapticTab } from "@/components/haptic-tab";
@@ -18,22 +18,31 @@ export default function TabLayout() {
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: () => (
-          <BlurView
-            intensity={85}
-            tint="light"
-            style={StyleSheet.absoluteFill}
-          />
+          <View style={{ borderRadius: 24, overflow: "hidden", ...StyleSheet.absoluteFillObject }}>
+            <BlurView
+              intensity={90}
+              tint={colorScheme === "dark" ? "dark" : "light"}
+              style={StyleSheet.absoluteFill}
+            />
+          </View>
         ),
         tabBarStyle: {
           position: "absolute",
-          backgroundColor: "rgba(255, 255, 252, 0.72)",
-          borderTopColor: "rgba(219, 229, 220, 0.55)",
-          borderTopWidth: 1,
-          height: Platform.OS === "ios" ? 86 : 66,
+          bottom: Platform.OS === "ios" ? 28 : 16,
+          left: 16,
+          right: 16,
+          height: 64,
+          borderRadius: 24,
+          backgroundColor: colorScheme === "dark" ? "rgba(11, 22, 20, 0.65)" : "rgba(255, 255, 252, 0.65)",
+          borderWidth: 1,
+          borderColor: colorScheme === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(219, 229, 220, 0.55)",
+          elevation: 8,
+          shadowColor: "#16201f",
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: colorScheme === "dark" ? 0.3 : 0.08,
+          shadowRadius: 16,
           paddingTop: 8,
-          paddingBottom: Platform.OS === "ios" ? 26 : 10,
-          elevation: 0,
-          shadowOpacity: 0,
+          paddingBottom: 8,
         },
         tabBarItemStyle: {
           borderRadius: 8,

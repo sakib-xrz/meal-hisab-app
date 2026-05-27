@@ -132,7 +132,8 @@ export default function MealHistoryScreen() {
     historyQuery.isLoading || (historyQuery.isFetching && entries.length === 0);
 
   return (
-    <Screen
+    <>
+      <Screen
       edges={[]}
       subtitle={`${formatShortDate(from)} - ${formatShortDate(to)}`}
       refreshing={historyQuery.isRefetching}
@@ -186,6 +187,7 @@ export default function MealHistoryScreen() {
         />
       </Link>
 
+    </Screen>
       <ConfirmSheet
         sheetRef={deleteSheet.ref}
         title="Delete meal entry"
@@ -199,6 +201,6 @@ export default function MealHistoryScreen() {
         loading={deleteMutation.isPending}
         onConfirm={confirmDelete}
       />
-    </Screen>
+    </>
   );
 }
