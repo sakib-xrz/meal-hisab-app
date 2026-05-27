@@ -333,23 +333,23 @@ export default function MealsScreen() {
             <Card title="Day total" className="mb-5 p-4">
               <View className="flex-row flex-wrap gap-2 pt-1">
                 <Badge
-                  label={`Breakfast ${summary.breakfast}`}
-                  variant="muted"
-                  pill
-                />
-                <Badge
-                  label={`Lunch ${summary.lunch}`}
-                  variant="primary"
-                  pill
-                />
-                <Badge
-                  label={`Dinner ${summary.dinner}`}
+                  label={`Breakfast: ${summary.breakfast}`}
                   variant="accent"
                   pill
                 />
                 <Badge
-                  label={`Total ${summary.total}`}
-                  variant="default"
+                  label={`Lunch: ${summary.lunch}`}
+                  variant="accent"
+                  pill
+                />
+                <Badge
+                  label={`Dinner: ${summary.dinner}`}
+                  variant="accent"
+                  pill
+                />
+                <Badge
+                  label={`Total: ${summary.total}`}
+                  variant="primary"
                   pill
                 />
               </View>
