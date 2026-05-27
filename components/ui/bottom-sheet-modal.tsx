@@ -1,10 +1,11 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import BottomSheet, {
+import {
   BottomSheetBackdrop,
+  BottomSheetModal,
   BottomSheetView,
   type BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ComponentRef } from "react";
 import { useCallback, useMemo, useRef } from "react";
 import { Text, View } from "react-native";
 
@@ -54,15 +55,17 @@ const variantConfig: Record<
   },
 };
 
+type BottomSheetModalRef = ComponentRef<typeof BottomSheetModal>;
+
 export function useBottomSheetModal() {
-  const ref = useRef<BottomSheet>(null);
+  const ref = useRef<BottomSheetModalRef>(null);
 
   const open = useCallback(() => {
-    ref.current?.snapToIndex(0);
+    ref.current?.present();
   }, []);
 
   const close = useCallback(() => {
-    ref.current?.close();
+    ref.current?.dismiss();
   }, []);
 
   return { ref, open, close };
@@ -79,7 +82,7 @@ export function ConfirmSheet({
   onConfirm,
   onCancel,
   children,
-}: BottomSheetModalProps & { sheetRef: React.RefObject<BottomSheet | null> }) {
+}: BottomSheetModalProps & { sheetRef: React.RefObject<BottomSheetModalRef | null> }) {
   const snapPoints = useMemo(() => ["40%"], []);
   const config = variantConfig[variant];
 
@@ -98,16 +101,16 @@ export function ConfirmSheet({
 
   const handleCancel = useCallback(() => {
     onCancel?.();
-    sheetRef.current?.close();
+    sheetRef.current?.dismiss();
   }, [onCancel, sheetRef]);
 
   return (
-    <BottomSheet
+    <BottomSheetModal
       ref={sheetRef}
-      index={-1}
       snapPoints={snapPoints}
       enablePanDownToClose
       backdropComponent={renderBackdrop}
+      style={{ zIndex: 1000, elevation: 1000 }}
       backgroundStyle={{
         backgroundColor: Brand.surface,
         borderTopLeftRadius: 24,
@@ -126,7 +129,11 @@ export function ConfirmSheet({
             className="h-14 w-14 items-center justify-center rounded-full"
             style={{ backgroundColor: config.iconBg }}
           >
-            <MaterialIcons name={config.iconName} size={28} color={config.iconColor} />
+            <MaterialIcons
+              name={config.iconName}
+              size={28}
+              color={config.iconColor}
+            />
           </View>
         </View>
 
@@ -145,21 +152,24 @@ export function ConfirmSheet({
         {children}
 
         {/* Actions */}
-        <View className="mt-auto gap-3">
+        <View className="mt-auto flex-row gap-3">
+          <Button
+            title={cancelLabel}
+            variant="secondary"
+            size="lg"
+            onPress={handleCancel}
+            className="flex-1"
+          />
           <Button
             title={confirmLabel}
             variant={config.confirmVariant}
             size="lg"
             loading={loading}
             onPress={onConfirm}
-          />
-          <Button
-            title={cancelLabel}
-            variant="ghost"
-            onPress={handleCancel}
+            className="flex-1"
           />
         </View>
       </BottomSheetView>
-    </BottomSheet>
+    </BottomSheetModal>
   );
 }
