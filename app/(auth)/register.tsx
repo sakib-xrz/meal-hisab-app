@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { Text, View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
@@ -49,12 +50,13 @@ export default function RegisterScreen() {
     <Screen keyboardAvoid contentClassName="pt-4">
       <BrandHero
         compact
-        className="mb-6"
+        className="mb-8"
         subtitle="Create your mess account in minutes"
       />
-      <Card title="Create account" subtitle="Start with a secure profile">
-        <View className="gap-4">
-          <View>
+
+      <Card variant="glass" animated animationDelay={200} title="Create account" subtitle="Start with a secure profile">
+        <View className="gap-5">
+          <Animated.View entering={FadeInDown.delay(300).duration(400).springify()}>
             <Label>Full name</Label>
             <Controller
               control={control}
@@ -62,6 +64,7 @@ export default function RegisterScreen() {
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
                   placeholder="Enter your full name"
+                  leftIcon="person"
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -69,9 +72,9 @@ export default function RegisterScreen() {
                 />
               )}
             />
-          </View>
+          </Animated.View>
 
-          <View>
+          <Animated.View entering={FadeInDown.delay(400).duration(400).springify()}>
             <Label>Phone</Label>
             <Controller
               control={control}
@@ -81,6 +84,7 @@ export default function RegisterScreen() {
                   placeholder="Enter your phone number"
                   keyboardType="phone-pad"
                   autoCapitalize="none"
+                  leftIcon="phone"
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -88,9 +92,9 @@ export default function RegisterScreen() {
                 />
               )}
             />
-          </View>
+          </Animated.View>
 
-          <View>
+          <Animated.View entering={FadeInDown.delay(500).duration(400).springify()}>
             <Label>Password</Label>
             <Controller
               control={control}
@@ -100,6 +104,7 @@ export default function RegisterScreen() {
                   placeholder="Enter your password"
                   passwordToggle
                   secureTextEntry
+                  leftIcon="lock"
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -107,21 +112,26 @@ export default function RegisterScreen() {
                 />
               )}
             />
-          </View>
+          </Animated.View>
 
-          <Button
-            title="Register"
-            leftIcon="person-add-alt-1"
-            loading={isSubmitting}
-            onPress={handleSubmit(onSubmit)}
-          />
+          <Animated.View entering={FadeInDown.delay(600).duration(400).springify()}>
+            <Button
+              title="Register"
+              leftIcon="person-add-alt-1"
+              size="lg"
+              loading={isSubmitting}
+              onPress={handleSubmit(onSubmit)}
+            />
+          </Animated.View>
 
-          <Text className="text-center font-sans text-sm text-muted">
-            Already have an account?{" "}
-            <Link href="/(auth)/login" className="font-semibold text-primary">
-              Sign in
-            </Link>
-          </Text>
+          <Animated.View entering={FadeInDown.delay(700).duration(400).springify()}>
+            <Text className="text-center font-sans text-sm text-muted">
+              Already have an account?{" "}
+              <Link href="/(auth)/login" className="font-semibold text-primary">
+                Sign in
+              </Link>
+            </Text>
+          </Animated.View>
         </View>
       </Card>
     </Screen>

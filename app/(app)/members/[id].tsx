@@ -1,21 +1,27 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
-import { Alert, Text, View } from "react-native";
 import { Controller, useForm } from "react-hook-form";
+import { Alert, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ConfirmSheet, useBottomSheetModal } from "@/components/ui/bottom-sheet-modal";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoadingScreen, Screen } from "@/components/ui/screen";
 import { SegmentControl } from "@/components/ui/segment-control";
+import { FadeIn, StaggerList } from "@/components/ui/animated-view";
 import { ApiError } from "@/lib/api/client";
 import type { MemberStatus, RoleKey } from "@/lib/api/types";
-import { useMembers, useRemoveMember, useUpdateMember } from "@/lib/queries/members";
+import {
+  useMembers,
+  useRemoveMember,
+  useUpdateMember,
+} from "@/lib/queries/members";
 
 const schema = z.object({
   fullName: z.string().min(2, "Name is required"),
@@ -122,37 +128,36 @@ export default function EditMemberScreen() {
           Toast.show({
             type: "error",
             text1: "Update failed",
-            text2: err instanceof ApiError ? err.message : "Something went wrong",
+            text2:
+              err instanceof ApiError ? err.message : "Something went wrong",
           });
         },
       },
     );
   };
 
+  const removeSheet = useBottomSheetModal();
+
   const handleRemove = () => {
+    removeSheet.open();
+  };
+
+  const confirmRemove = () => {
     if (!id || !member) return;
-    Alert.alert("Remove member", `Remove ${member.fullName} from the mess?`, [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Remove",
-        style: "destructive",
-        onPress: () => {
-          removeMutation.mutate(id, {
-            onSuccess: () => {
-              Toast.show({ type: "success", text1: "Member removed" });
-              router.back();
-            },
-            onError: (err) => {
-              Toast.show({
-                type: "error",
-                text1: "Remove failed",
-                text2: err instanceof ApiError ? err.message : "Something went wrong",
-              });
-            },
-          });
-        },
+    removeMutation.mutate(id, {
+      onSuccess: () => {
+        Toast.show({ type: "success", text1: "Member removed" });
+        removeSheet.close();
+        router.back();
       },
-    ]);
+      onError: (err) => {
+        Toast.show({
+          type: "error",
+          text1: "Remove failed",
+          text2: err instanceof ApiError ? err.message : "Something went wrong",
+        });
+      },
+    });
   };
 
   if (membersQuery.isLoading) {
@@ -183,8 +188,8 @@ export default function EditMemberScreen() {
         ) : undefined
       }
     >
-      <Card>
-        <View className="gap-4">
+      <Card variant="glass">
+        <StaggerList staggerMs={40} className="mb-4.5">
           <View>
             <Label>Full name *</Label>
             <Controller
@@ -292,7 +297,8 @@ export default function EditMemberScreen() {
 
           {isOwner ? (
             <Text className="font-sans text-sm text-muted">
-              Owner - role and status cannot be changed here. Use transfer ownership first.
+              Owner - role and status cannot be changed here. Use transfer
+              ownership first.
             </Text>
           ) : (
             <>
@@ -301,7 +307,9 @@ export default function EditMemberScreen() {
                 <SegmentControl
                   options={ROLE_OPTIONS}
                   value={roleKey}
-                  onChange={(v) => setValue("roleKey", v as "MEMBER" | "MANAGER")}
+                  onChange={(v) =>
+                    setValue("roleKey", v as "MEMBER" | "MANAGER")
+                  }
                   disabled={isLeft}
                 />
               </View>
@@ -311,7 +319,9 @@ export default function EditMemberScreen() {
                 <SegmentControl
                   options={STATUS_OPTIONS}
                   value={status}
-                  onChange={(v) => setValue("status", v as "ACTIVE" | "INACTIVE")}
+                  onChange={(v) =>
+                    setValue("status", v as "ACTIVE" | "INACTIVE")
+                  }
                   disabled={isLeft}
                 />
               </View>
@@ -324,10 +334,21 @@ export default function EditMemberScreen() {
               leftIcon="save"
               loading={updateMutation.isPending}
               onPress={handleSubmit(onSubmit)}
+              className="mt-2"
             />
           ) : null}
-        </View>
+        </StaggerList>
       </Card>
+
+      <ConfirmSheet
+        sheetRef={removeSheet.ref}
+        title="Remove member"
+        description={`Remove ${member.fullName} from the mess?`}
+        confirmLabel="Remove"
+        variant="danger"
+        loading={removeMutation.isPending}
+        onConfirm={confirmRemove}
+      />
     </Screen>
   );
 }

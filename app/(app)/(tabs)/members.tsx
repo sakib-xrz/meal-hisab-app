@@ -1,11 +1,16 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
+import { StaggerList } from "@/components/ui/animated-view";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import {
+  ConfirmSheet,
+  useBottomSheetModal,
+} from "@/components/ui/bottom-sheet-modal";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -13,6 +18,7 @@ import { ErrorState } from "@/components/ui/error-state";
 import { Input } from "@/components/ui/input";
 import { Screen } from "@/components/ui/screen";
 import { SegmentControl } from "@/components/ui/segment-control";
+import { ShimmerRow } from "@/components/ui/shimmer";
 import { useAuth } from "@/context/auth-provider";
 import { ApiError } from "@/lib/api/client";
 import type { Member, MemberStatus, RoleKey } from "@/lib/api/types";
@@ -49,6 +55,9 @@ export default function MembersScreen() {
   const removeMutation = useRemoveMember();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ACTIVE");
   const [search, setSearch] = useState("");
+  const [removeTarget, setRemoveTarget] = useState<Member | null>(null);
+
+  const removeSheet = useBottomSheetModal();
 
   const membersQuery = useMembers({
     status: statusFilter === "ALL" ? undefined : statusFilter,
@@ -57,40 +66,40 @@ export default function MembersScreen() {
   });
 
   const handleRemove = (member: Member) => {
-    Alert.alert("Remove member", `Remove ${member.fullName} from the mess?`, [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Remove",
-        style: "destructive",
-        onPress: () => {
-          removeMutation.mutate(member.id, {
-            onSuccess: () => {
-              Toast.show({ type: "success", text1: "Member removed" });
-            },
-            onError: (err) => {
-              Toast.show({
-                type: "error",
-                text1: "Remove failed",
-                text2:
-                  err instanceof ApiError
-                    ? err.message
-                    : "Something went wrong",
-              });
-            },
-          });
-        },
+    setRemoveTarget(member);
+    removeSheet.open();
+  };
+
+  const confirmRemove = () => {
+    if (!removeTarget) return;
+    removeMutation.mutate(removeTarget.id, {
+      onSuccess: () => {
+        Toast.show({ type: "success", text1: "Member removed" });
+        removeSheet.close();
+        setRemoveTarget(null);
       },
-    ]);
+      onError: (err) => {
+        Toast.show({
+          type: "error",
+          text1: "Remove failed",
+          text2: err instanceof ApiError ? err.message : "Something went wrong",
+        });
+      },
+    });
   };
 
   const members = membersQuery.data ?? [];
+  const showSkeleton =
+    membersQuery.isLoading || (membersQuery.isFetching && members.length === 0);
 
   return (
     <Screen
+      tabScreen
       title="Members"
-      subtitle={`${members.length} shown`}
+      subtitle={`${members.length} member${members.length === 1 ? "" : "s"}`}
       refreshing={membersQuery.isRefetching}
       onRefresh={() => membersQuery.refetch()}
+      contentClassName="pt-2"
       footer={
         isManagerOrAbove ? (
           <Button
@@ -102,7 +111,8 @@ export default function MembersScreen() {
         ) : undefined
       }
     >
-      <View className="mb-4 gap-3">
+      {/* Search & Filters Glass Card */}
+      <Card variant="glass" className="mb-5 gap-3.5 p-3.5 shadow-sm">
         <SegmentControl
           options={STATUS_FILTERS}
           value={statusFilter}
@@ -112,8 +122,9 @@ export default function MembersScreen() {
           placeholder="Search by name"
           value={search}
           onChangeText={setSearch}
+          leftIcon="search"
         />
-      </View>
+      </Card>
 
       {membersQuery.error ? (
         <ErrorState
@@ -126,73 +137,115 @@ export default function MembersScreen() {
         />
       ) : null}
 
-      <View className="gap-3">
-        {members.map((member) => (
-          <Card key={member.id}>
-            <View className="mb-3 flex-row items-center">
-              <Avatar name={member.fullName} size="sm" className="mr-3" />
-              <View className="flex-1">
-                <Text className="font-sans text-base font-semibold text-foreground" numberOfLines={1}>
-                  {member.fullName}
-                </Text>
-                <View className="mt-1 flex-row flex-wrap gap-2">
-                  <Badge label={member.roleKey} variant={roleBadgeVariant(member.roleKey)} />
-                  <Badge label={member.status} variant={statusBadgeVariant(member.status)} />
-                </View>
-              </View>
-            </View>
-
-            {member.roomNo ? (
-              <Text className="font-sans text-sm text-muted">Room {member.roomNo}</Text>
-            ) : null}
-            {member.phone ? (
-              <Text className="font-sans text-sm text-muted">{member.phone}</Text>
-            ) : null}
-            {member.email ? (
-              <Text className="font-sans text-sm text-muted">{member.email}</Text>
-            ) : null}
-            {member.joiningDate ? (
-              <Text className="font-sans text-sm text-muted">
-                Joined {formatShortDate(member.joiningDate)}
-              </Text>
-            ) : null}
-
-            {isManagerOrAbove ? (
-              <View className="mt-3 flex-row gap-2 border-t border-border pt-3">
-                <Pressable
-                  onPress={() => router.push(`/(app)/members/${member.id}`)}
-                  hitSlop={8}
-                  className="h-9 flex-row items-center justify-center rounded-md bg-primary-soft px-3 active:opacity-80"
-                  accessibilityRole="button"
-                  accessibilityLabel={`Edit ${member.fullName}`}
-                >
-                  <MaterialIcons name="edit" size={16} color="#0b4f4a" />
-                  <Text className="ml-1.5 font-sans text-sm font-semibold text-primary-dark">
-                    Edit
-                  </Text>
-                </Pressable>
-                {canManageMember(member) ? (
-                  <Pressable
-                    onPress={() => handleRemove(member)}
-                    disabled={removeMutation.isPending}
-                    hitSlop={8}
-                    className="h-9 flex-row items-center justify-center rounded-md bg-danger-soft px-3 active:opacity-80 disabled:opacity-50"
-                    accessibilityRole="button"
-                    accessibilityLabel={`Remove ${member.fullName}`}
-                  >
-                    <MaterialIcons name="person-remove" size={16} color="#d9385e" />
-                    <Text className="ml-1.5 font-sans text-sm font-semibold text-danger">
-                      Remove
+      {showSkeleton ? (
+        <View className="gap-3">
+          <ShimmerRow />
+          <ShimmerRow />
+          <ShimmerRow />
+        </View>
+      ) : members.length > 0 ? (
+        <View className="gap-3.5 mb-6">
+          <StaggerList staggerMs={40}>
+            {members.map((member) => (
+              <Card
+                key={member.id}
+                className="p-4 shadow-sm border border-border/40"
+              >
+                <View className="mb-3 flex-row items-center">
+                  <Avatar name={member.fullName} size="sm" className="mr-3" />
+                  <View className="flex-1">
+                    <Text
+                      className="font-sans text-base font-semibold text-foreground"
+                      numberOfLines={1}
+                    >
+                      {member.fullName}
                     </Text>
-                  </Pressable>
-                ) : null}
-              </View>
-            ) : null}
-          </Card>
-        ))}
-      </View>
+                    <View className="mt-1 flex-row flex-wrap gap-2">
+                      <Badge
+                        label={member.roleKey}
+                        variant={roleBadgeVariant(member.roleKey)}
+                        pill
+                      />
+                      <Badge
+                        label={member.status}
+                        variant={statusBadgeVariant(member.status)}
+                        pill
+                      />
+                    </View>
+                  </View>
+                </View>
 
-      {membersQuery.isSuccess && members.length === 0 ? (
+                <View className="gap-1 mt-1 pl-1">
+                  {member.roomNo ? (
+                    <Text className="font-sans text-sm text-muted">
+                      <MaterialIcons name="room" size={13} color="#8b9894" />{" "}
+                      Room {member.roomNo}
+                    </Text>
+                  ) : null}
+                  {member.phone ? (
+                    <Text className="font-sans text-sm text-muted">
+                      <MaterialIcons name="phone" size={13} color="#8b9894" />{" "}
+                      {member.phone}
+                    </Text>
+                  ) : null}
+                  {member.email ? (
+                    <Text className="font-sans text-sm text-muted">
+                      <MaterialIcons name="email" size={13} color="#8b9894" />{" "}
+                      {member.email}
+                    </Text>
+                  ) : null}
+                  {member.joiningDate ? (
+                    <Text className="font-sans text-sm text-muted">
+                      <MaterialIcons
+                        name="date-range"
+                        size={13}
+                        color="#8b9894"
+                      />{" "}
+                      Joined {formatShortDate(member.joiningDate)}
+                    </Text>
+                  ) : null}
+                </View>
+
+                {isManagerOrAbove ? (
+                  <View className="mt-4 flex-row gap-3 border-t border-border/50 pt-3">
+                    <Pressable
+                      onPress={() => router.push(`/(app)/members/${member.id}`)}
+                      hitSlop={8}
+                      className="h-9 flex-1 flex-row items-center justify-center rounded-xl bg-primary-soft/80 active:scale-95 active:opacity-85"
+                      accessibilityRole="button"
+                      accessibilityLabel={`Edit ${member.fullName}`}
+                    >
+                      <MaterialIcons name="edit" size={16} color="#0b4f4a" />
+                      <Text className="ml-1.5 font-sans text-sm font-semibold text-primary-dark">
+                        Edit
+                      </Text>
+                    </Pressable>
+                    {canManageMember(member) ? (
+                      <Pressable
+                        onPress={() => handleRemove(member)}
+                        disabled={removeMutation.isPending}
+                        hitSlop={8}
+                        className="h-9 flex-1 flex-row items-center justify-center rounded-xl bg-danger-soft/80 active:scale-95 active:opacity-85 disabled:opacity-50"
+                        accessibilityRole="button"
+                        accessibilityLabel={`Remove ${member.fullName}`}
+                      >
+                        <MaterialIcons
+                          name="person-remove"
+                          size={16}
+                          color="#d9385e"
+                        />
+                        <Text className="ml-1.5 font-sans text-sm font-semibold text-danger">
+                          Remove
+                        </Text>
+                      </Pressable>
+                    ) : null}
+                  </View>
+                ) : null}
+              </Card>
+            ))}
+          </StaggerList>
+        </View>
+      ) : membersQuery.isSuccess && members.length === 0 ? (
         <EmptyState
           title="No members found"
           description={
@@ -208,6 +261,20 @@ export default function MembersScreen() {
           }
         />
       ) : null}
+
+      <ConfirmSheet
+        sheetRef={removeSheet.ref}
+        title="Remove member"
+        description={
+          removeTarget
+            ? `Remove ${removeTarget.fullName} from the mess?`
+            : "Remove this member?"
+        }
+        confirmLabel="Remove"
+        variant="danger"
+        loading={removeMutation.isPending}
+        onConfirm={confirmRemove}
+      />
     </Screen>
   );
 }

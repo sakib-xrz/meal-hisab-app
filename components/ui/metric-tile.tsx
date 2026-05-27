@@ -1,6 +1,13 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import type { ComponentProps } from "react";
+import { useEffect } from "react";
 import { Text, View, type ViewProps } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  Easing,
+} from "react-native-reanimated";
 
 import { cn } from "@/lib/utils/cn";
 
@@ -12,32 +19,33 @@ type MetricTileProps = ViewProps & {
   value: string;
   icon?: MaterialIconName;
   tone?: MetricTone;
+  animated?: boolean;
   className?: string;
 };
 
 const toneClasses: Record<MetricTone, { tile: string; icon: string; iconColor: string }> = {
   primary: {
-    tile: "border-primary-soft bg-primary-soft/55",
+    tile: "border-primary-soft/70 bg-primary-soft/40",
     icon: "bg-primary",
     iconColor: "#fffffc",
   },
   accent: {
-    tile: "border-accent-soft bg-accent-soft/70",
+    tile: "border-accent-soft/70 bg-accent-soft/50",
     icon: "bg-accent",
     iconColor: "#16201f",
   },
   info: {
-    tile: "border-info-soft bg-info-soft/70",
+    tile: "border-info-soft/70 bg-info-soft/50",
     icon: "bg-info",
     iconColor: "#fffffc",
   },
   danger: {
-    tile: "border-danger-soft bg-danger-soft/65",
+    tile: "border-danger-soft/70 bg-danger-soft/45",
     icon: "bg-danger",
     iconColor: "#fffffc",
   },
   muted: {
-    tile: "border-border bg-surface-muted/80",
+    tile: "border-border bg-surface-muted/60",
     icon: "bg-foreground-secondary",
     iconColor: "#fffffc",
   },
@@ -48,33 +56,49 @@ export function MetricTile({
   value,
   icon,
   tone = "primary",
+  animated = true,
   className,
   ...props
 }: MetricTileProps) {
   const classes = toneClasses[tone];
+  const opacity = useSharedValue(animated ? 0 : 1);
+  const translateY = useSharedValue(animated ? 8 : 0);
+
+  useEffect(() => {
+    if (animated) {
+      opacity.value = withTiming(1, { duration: 500, easing: Easing.out(Easing.ease) });
+      translateY.value = withTiming(0, { duration: 500, easing: Easing.out(Easing.ease) });
+    }
+  }, [animated, opacity, translateY]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }],
+  }));
 
   return (
-    <View
+    <Animated.View
+      style={animatedStyle}
       className={cn(
-        "rounded-lg border p-3 shadow-sm shadow-foreground/5",
+        "rounded-2xl border p-4 shadow-sm shadow-foreground/5",
         classes.tile,
         className,
       )}
       {...props}
     >
       <View className="mb-3 flex-row items-center justify-between gap-3">
-        <Text className="flex-1 font-sans text-xs font-semibold text-foreground-secondary">
+        <Text className="flex-1 font-sans text-xs font-semibold tracking-wide text-foreground-secondary">
           {label}
         </Text>
         {icon ? (
-          <View className={cn("h-8 w-8 items-center justify-center rounded-md", classes.icon)}>
-            <MaterialIcons name={icon} size={17} color={classes.iconColor} />
+          <View className={cn("h-9 w-9 items-center justify-center rounded-xl", classes.icon)}>
+            <MaterialIcons name={icon} size={18} color={classes.iconColor} />
           </View>
         ) : null}
       </View>
       <Text className="font-sans text-2xl font-bold text-foreground" numberOfLines={1}>
         {value}
       </Text>
-    </View>
+    </Animated.View>
   );
 }

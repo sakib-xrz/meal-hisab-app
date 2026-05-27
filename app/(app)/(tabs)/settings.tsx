@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { ListRow } from "@/components/ui/list-row";
 import { Screen } from "@/components/ui/screen";
 import { SectionHeader } from "@/components/ui/section-header";
+import { FadeIn } from "@/components/ui/animated-view";
 import { useAuth } from "@/context/auth-provider";
 import { ApiError } from "@/lib/api/client";
 import {
@@ -316,266 +317,289 @@ export default function SettingsScreen() {
   };
 
   return (
-    <Screen title="Settings">
-      <Card className="mb-4">
-        <View className="mb-4 flex-row items-center gap-4">
-          <Avatar
-            name={user?.name}
-            uri={user?.avatarUrl}
-            size="lg"
-            key={user?.id ?? "avatar"}
-          />
-          <View className="flex-1">
-            <Text className="font-sans text-xl font-bold text-foreground" numberOfLines={1}>
-              {user?.name ?? "Your profile"}
-            </Text>
-            <Text className="mt-1 font-sans text-sm text-muted" numberOfLines={1}>
-              {user?.phone}
-            </Text>
-            {myRole ? (
-              <Badge label={myRole} variant="primary" className="mt-2" />
-            ) : null}
-          </View>
-        </View>
-
-        <View className="mb-4 flex-row gap-2">
-          <View className="flex-1">
-            <Button
-              title="Change photo"
-              variant="secondary"
-              leftIcon="photo-camera"
-              loading={updateAvatarMutation.isPending}
-              onPress={pickAvatar}
+    <Screen tabScreen title="Settings">
+      <FadeIn delay={50}>
+        <Card variant="glass" className="mb-4">
+          <View className="mb-4 flex-row items-center gap-4">
+            <Avatar
+              name={user?.name}
+              uri={user?.avatarUrl}
+              size="lg"
+              key={user?.id ?? "avatar"}
             />
+            <View className="flex-1">
+              <Text
+                className="font-sans text-xl font-bold text-foreground"
+                numberOfLines={1}
+              >
+                {user?.name ?? "Your profile"}
+              </Text>
+              <Text
+                className="mt-1 font-sans text-sm text-muted"
+                numberOfLines={1}
+              >
+                {user?.phone}
+              </Text>
+              {myRole ? (
+                <Badge label={myRole} variant="primary" className="mt-2" />
+              ) : null}
+            </View>
           </View>
-          {user?.avatarUrl ? (
+
+          <View className="mb-4 flex-row gap-2">
             <View className="flex-1">
               <Button
-                title="Remove"
-                variant="ghost"
-                leftIcon="delete-outline"
-                onPress={handleDeleteAvatar}
+                title="Change photo"
+                variant="secondary"
+                leftIcon="photo-camera"
+                loading={updateAvatarMutation.isPending}
+                onPress={pickAvatar}
+              />
+            </View>
+            {user?.avatarUrl ? (
+              <View className="flex-1">
+                <Button
+                  title="Remove"
+                  variant="ghost"
+                  leftIcon="delete-outline"
+                  onPress={handleDeleteAvatar}
+                />
+              </View>
+            ) : null}
+          </View>
+
+          <Label>Name</Label>
+          <Controller
+            control={profileForm.control}
+            name="name"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                error={profileForm.formState.errors.name?.message}
+              />
+            )}
+          />
+          <View className="mt-3">
+            <Button
+              title="Save profile"
+              variant="secondary"
+              leftIcon="save"
+              loading={updateProfileMutation.isPending}
+              onPress={profileForm.handleSubmit(onSaveProfile)}
+            />
+          </View>
+        </Card>
+      </FadeIn>
+
+      <FadeIn delay={100}>
+        <Card variant="glass" className="mb-4">
+          <Button
+            title={
+              showPasswordForm ? "Cancel password change" : "Change password"
+            }
+            variant="secondary"
+            leftIcon={showPasswordForm ? "close" : "lock-reset"}
+            onPress={() => setShowPasswordForm((v) => !v)}
+          />
+          {showPasswordForm ? (
+            <View className="mt-4 gap-3">
+              <Controller
+                control={passwordForm.control}
+                name="currentPassword"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    placeholder="Current password"
+                    secureTextEntry
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                  />
+                )}
+              />
+              <Controller
+                control={passwordForm.control}
+                name="newPassword"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    placeholder="New password"
+                    secureTextEntry
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                  />
+                )}
+              />
+              <Controller
+                control={passwordForm.control}
+                name="confirmPassword"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    placeholder="Confirm new password"
+                    secureTextEntry
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    error={passwordForm.formState.errors.confirmPassword?.message}
+                  />
+                )}
+              />
+              <Button
+                title="Update password"
+                leftIcon="key"
+                loading={changePasswordMutation.isPending}
+                onPress={passwordForm.handleSubmit(onChangePassword)}
               />
             </View>
           ) : null}
-        </View>
-
-        <Label>Name</Label>
-        <Controller
-          control={profileForm.control}
-          name="name"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              error={profileForm.formState.errors.name?.message}
-            />
-          )}
-        />
-        <View className="mt-3">
-          <Button
-            title="Save profile"
-            variant="secondary"
-            leftIcon="save"
-            loading={updateProfileMutation.isPending}
-            onPress={profileForm.handleSubmit(onSaveProfile)}
-          />
-        </View>
-      </Card>
-
-      <Card className="mb-4">
-        <Button
-          title={
-            showPasswordForm ? "Cancel password change" : "Change password"
-          }
-          variant="secondary"
-          leftIcon={showPasswordForm ? "close" : "lock-reset"}
-          onPress={() => setShowPasswordForm((v) => !v)}
-        />
-        {showPasswordForm ? (
-          <View className="mt-4 gap-3">
-            <Controller
-              control={passwordForm.control}
-              name="currentPassword"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  placeholder="Current password"
-                  secureTextEntry
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                />
-              )}
-            />
-            <Controller
-              control={passwordForm.control}
-              name="newPassword"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  placeholder="New password"
-                  secureTextEntry
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                />
-              )}
-            />
-            <Controller
-              control={passwordForm.control}
-              name="confirmPassword"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  placeholder="Confirm new password"
-                  secureTextEntry
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={passwordForm.formState.errors.confirmPassword?.message}
-                />
-              )}
-            />
-            <Button
-              title="Update password"
-              leftIcon="key"
-              loading={changePasswordMutation.isPending}
-              onPress={passwordForm.handleSubmit(onChangePassword)}
-            />
-          </View>
-        ) : null}
-      </Card>
+        </Card>
+      </FadeIn>
 
       {messQuery.data ? (
-        <Card className="mb-4">
-          <SectionHeader title="Current mess" className="mt-0" />
-          <Text className="mb-2 font-sans text-lg font-semibold text-foreground">
-            {messQuery.data.name}
-          </Text>
-          {messQuery.data.address ? (
-            <Text className="mb-1 font-sans text-sm text-muted">
-              {messQuery.data.address}
+        <FadeIn delay={150}>
+          <Card variant="glass" className="mb-4">
+            <SectionHeader title="Current mess" className="mt-0" />
+            <Text className="mb-2 font-sans text-lg font-semibold text-foreground">
+              {messQuery.data.name}
             </Text>
-          ) : null}
-          {messQuery.data.phone ? (
-            <Text className="mb-1 font-sans text-sm text-muted">
-              {messQuery.data.phone}
-            </Text>
-          ) : null}
-          {messQuery.data.owner ? (
-            <Text className="mb-2 font-sans text-sm text-muted">
-              Owner: {messQuery.data.owner.name}
-            </Text>
-          ) : null}
-          <Badge
-            label={`${messQuery.data.activeMemberCount ?? 0} active - ${messQuery.data.isActive ? "Active" : "Inactive"}`}
-            variant="muted"
-          />
-        </Card>
+            {messQuery.data.address ? (
+              <Text className="mb-1 font-sans text-sm text-muted">
+                {messQuery.data.address}
+              </Text>
+            ) : null}
+            {messQuery.data.phone ? (
+              <Text className="mb-1 font-sans text-sm text-muted">
+                {messQuery.data.phone}
+              </Text>
+            ) : null}
+            {messQuery.data.owner ? (
+              <Text className="mb-2 font-sans text-sm text-muted">
+                Owner: {messQuery.data.owner.name}
+              </Text>
+            ) : null}
+            <Badge
+              label={`${messQuery.data.activeMemberCount ?? 0} active - ${messQuery.data.isActive ? "Active" : "Inactive"}`}
+              variant="muted"
+            />
+          </Card>
+        </FadeIn>
       ) : null}
 
       {isManagerOrAbove ? (
-        <Card className="mb-4">
-          <SectionHeader title="Mess settings" className="mt-0" />
-          <Button
-            title={showMessForm ? "Cancel" : "Edit mess"}
-            variant="secondary"
-            leftIcon={showMessForm ? "close" : "edit"}
-            onPress={() => setShowMessForm((v) => !v)}
-          />
-          {showMessForm ? (
-            <View className="mt-4 gap-3">
-              <Controller
-                control={messForm.control}
-                name="name"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    placeholder="Mess name"
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    error={messForm.formState.errors.name?.message}
-                  />
-                )}
-              />
-              <Controller
-                control={messForm.control}
-                name="address"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    placeholder="Address"
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                  />
-                )}
-              />
-              <Controller
-                control={messForm.control}
-                name="phone"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    placeholder="Contact phone"
-                    keyboardType="phone-pad"
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                  />
-                )}
-              />
-              <View className="flex-row items-center justify-between py-1">
-                <Text className="font-sans text-base text-foreground-secondary">
-                  Mess is active
-                </Text>
+        <FadeIn delay={200}>
+          <Card variant="glass" className="mb-4">
+            <SectionHeader title="Mess settings" className="mt-0" />
+            <Button
+              title={showMessForm ? "Cancel" : "Edit mess"}
+              variant="secondary"
+              leftIcon={showMessForm ? "close" : "edit"}
+              onPress={() => setShowMessForm((v) => !v)}
+            />
+            {showMessForm ? (
+              <View className="mt-4 gap-3">
                 <Controller
                   control={messForm.control}
-                  name="isActive"
-                  render={({ field: { onChange, value } }) => (
-                    <Switch
+                  name="name"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      placeholder="Mess name"
                       value={value}
-                      onValueChange={onChange}
-                      trackColor={{ true: "#0f766e", false: "#dbe5dc" }}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      error={messForm.formState.errors.name?.message}
                     />
                   )}
                 />
+                <Controller
+                  control={messForm.control}
+                  name="address"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      placeholder="Address"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                    />
+                  )}
+                />
+                <Controller
+                  control={messForm.control}
+                  name="phone"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      placeholder="Contact phone"
+                      keyboardType="phone-pad"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                    />
+                  )}
+                />
+                <View className="flex-row items-center justify-between py-1">
+                  <Text className="font-sans text-base text-foreground-secondary">
+                    Mess is active
+                  </Text>
+                  <Controller
+                    control={messForm.control}
+                    name="isActive"
+                    render={({ field: { onChange, value } }) => (
+                      <Switch
+                        value={value}
+                        onValueChange={onChange}
+                        trackColor={{ true: "#0f766e", false: "#dbe5dc" }}
+                      />
+                    )}
+                  />
+                </View>
+                <Button
+                  title="Save mess"
+                  leftIcon="save"
+                  loading={updateMessMutation.isPending}
+                  onPress={messForm.handleSubmit(onSaveMess)}
+                />
               </View>
-              <Button
-                title="Save mess"
-                leftIcon="save"
-                loading={updateMessMutation.isPending}
-                onPress={messForm.handleSubmit(onSaveMess)}
-              />
-            </View>
-          ) : null}
-        </Card>
+            ) : null}
+          </Card>
+        </FadeIn>
       ) : null}
 
-      <Card className="mb-4">
-        <SectionHeader title="Membership" className="mt-0" />
-        {isOwner ? (
-          <View className="gap-3">
-            <ListRow
-              title="Transfer ownership"
-              showChevron
-              onPress={() => router.push("/(app)/settings/transfer-ownership")}
-            />
+      <FadeIn delay={250}>
+        <Card variant="glass" className="mb-4">
+          <SectionHeader title="Membership" className="mt-0" />
+          {isOwner ? (
+            <View className="gap-3">
+              <ListRow
+                title="Transfer ownership"
+                showChevron
+                onPress={() => router.push("/(app)/settings/transfer-ownership")}
+              />
+              <Button
+                title="Delete mess"
+                variant="danger"
+                leftIcon="delete-forever"
+                onPress={handleDeleteMess}
+              />
+            </View>
+          ) : (
             <Button
-              title="Delete mess"
+              title="Leave mess"
               variant="danger"
-              leftIcon="delete-forever"
-              onPress={handleDeleteMess}
+              leftIcon="logout"
+              onPress={handleLeaveMess}
             />
-          </View>
-        ) : (
-          <Button
-            title="Leave mess"
-            variant="danger"
-            leftIcon="logout"
-            onPress={handleLeaveMess}
-          />
-        )}
-      </Card>
+          )}
+        </Card>
+      </FadeIn>
 
-      <Button title="Sign out" variant="danger" leftIcon="logout" onPress={handleLogout} />
+      <FadeIn delay={300}>
+        <Button
+          title="Sign out"
+          variant="danger"
+          leftIcon="logout"
+          onPress={handleLogout}
+        />
+      </FadeIn>
     </Screen>
   );
 }

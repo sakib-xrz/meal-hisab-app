@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Screen } from "@/components/ui/screen";
 import { SegmentControl } from "@/components/ui/segment-control";
+import { FadeIn, StaggerList } from "@/components/ui/animated-view";
 import { ApiError } from "@/lib/api/client";
 import type { RoleKey } from "@/lib/api/types";
 import { useAddMember } from "@/lib/queries/members";
@@ -28,10 +29,15 @@ const schema = z
       .or(z.literal("")),
     roleKey: z.enum(["MEMBER", "MANAGER"]),
   })
-  .refine((d) => (d.fullName?.trim()?.length ?? 0) >= 2 || (d.phone?.trim()?.length ?? 0) >= 10, {
-    message: "Provide full name (2+ chars) or a registered user's phone",
-    path: ["phone"],
-  });
+  .refine(
+    (d) =>
+      (d.fullName?.trim()?.length ?? 0) >= 2 ||
+      (d.phone?.trim()?.length ?? 0) >= 10,
+    {
+      message: "Provide full name (2+ chars) or a registered user's phone",
+      path: ["phone"],
+    },
+  );
 
 type FormValues = z.infer<typeof schema>;
 
@@ -81,7 +87,8 @@ export default function AddMemberScreen() {
           Toast.show({
             type: "error",
             text1: "Could not add member",
-            text2: err instanceof ApiError ? err.message : "Something went wrong",
+            text2:
+              err instanceof ApiError ? err.message : "Something went wrong",
           });
         },
       },
@@ -91,12 +98,13 @@ export default function AddMemberScreen() {
   return (
     <Screen edges={[]} keyboardAvoid>
       <Text className="mb-4 font-sans text-sm leading-5 text-muted">
-        Add by phone to link a registered user, or enter a full name for a manual profile.
-        Managers can assign roles; owners cannot be created here.
+        Add by phone to link a registered user, or enter a full name for a
+        manual profile. Managers can assign roles; owners cannot be created
+        here.
       </Text>
 
-      <Card>
-        <View className="gap-4">
+      <Card variant="glass">
+        <StaggerList staggerMs={40} className="mb-4.5">
           <View>
             <Label>Full name</Label>
             <Controller
@@ -198,8 +206,9 @@ export default function AddMemberScreen() {
             leftIcon="person-add-alt-1"
             loading={addMutation.isPending}
             onPress={handleSubmit(onSubmit)}
+            className="mt-2"
           />
-        </View>
+        </StaggerList>
       </Card>
     </Screen>
   );

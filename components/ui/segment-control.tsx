@@ -1,6 +1,16 @@
+import { useEffect } from "react";
 import { Pressable, Text, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
 import { cn } from "@/lib/utils/cn";
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+
 
 type SegmentOption<T extends string> = {
   value: T;
@@ -22,36 +32,56 @@ export function SegmentControl<T extends string>({
   className,
   disabled,
 }: SegmentControlProps<T>) {
+  const selectedIndex = options.findIndex((o) => o.value === value);
+  const indicatorLeft = useSharedValue(selectedIndex >= 0 ? selectedIndex : 0);
+
+  useEffect(() => {
+    const idx = options.findIndex((o) => o.value === value);
+    if (idx >= 0) {
+      indicatorLeft.value = withSpring(idx, { damping: 18, stiffness: 160 });
+    }
+  }, [value, options, indicatorLeft]);
+
+  const indicatorStyle = useAnimatedStyle(() => ({
+    left: `${(indicatorLeft.value / options.length) * 100}%` as any,
+    width: `${100 / options.length}%` as any,
+  }));
+
   return (
     <View
       className={cn(
-        "flex-row rounded-lg border border-border bg-surface-muted p-1",
-        className
+        "relative flex-row overflow-hidden rounded-xl border border-border bg-surface-muted p-1",
+        className,
       )}
     >
+      {/* Animated sliding indicator */}
+      <Animated.View
+        style={indicatorStyle}
+        className="absolute bottom-1 top-1 rounded-lg bg-surface shadow-sm shadow-black/8"
+      />
+
       {options.map((option) => {
         const selected = option.value === value;
         return (
-          <Pressable
+          <AnimatedPressable
             key={option.value}
             onPress={() => !disabled && onChange(option.value)}
             className={cn(
-              "min-h-10 flex-1 items-center justify-center rounded-md px-3 py-2",
-              selected && "bg-surface shadow-sm shadow-black/5",
-              disabled && "opacity-50"
+              "z-10 min-h-10 flex-1 items-center justify-center rounded-lg px-3 py-2",
+              disabled && "opacity-50",
             )}
             accessibilityRole="button"
             accessibilityState={{ selected }}
           >
             <Text
               className={cn(
-                "font-sans text-sm font-medium",
-                selected ? "text-primary" : "text-muted"
+                "font-sans text-sm font-semibold",
+                selected ? "text-primary" : "text-muted",
               )}
             >
               {option.label}
             </Text>
-          </Pressable>
+          </AnimatedPressable>
         );
       })}
     </View>

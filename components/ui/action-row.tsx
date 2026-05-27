@@ -1,8 +1,15 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import type { ComponentProps } from "react";
 import { Pressable, Text, View, type PressableProps } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
 import { cn } from "@/lib/utils/cn";
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 type MaterialIconName = ComponentProps<typeof MaterialIcons>["name"];
 
@@ -41,22 +48,38 @@ export function ActionRow({
   right,
   tone = "primary",
   className,
+  onPressIn,
+  onPressOut,
   ...props
 }: ActionRowProps) {
   const currentTone = toneClasses[tone];
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   return (
-    <Pressable
+    <AnimatedPressable
+      style={animatedStyle}
       className={cn(
-        "flex-row items-center rounded-lg border border-border bg-surface px-3.5 py-3 shadow-sm shadow-foreground/5 active:opacity-80",
+        "flex-row items-center rounded-2xl border border-border bg-surface px-4 py-3.5 shadow-sm shadow-foreground/5",
         className,
       )}
       accessibilityRole="button"
+      onPressIn={(e: any) => {
+        scale.value = withSpring(0.98, { damping: 15, stiffness: 200 });
+        onPressIn?.(e);
+      }}
+      onPressOut={(e: any) => {
+        scale.value = withSpring(1, { damping: 15, stiffness: 200 });
+        onPressOut?.(e);
+      }}
       {...props}
     >
       {icon ? (
-        <View className={cn("mr-3 h-10 w-10 items-center justify-center rounded-md", currentTone.icon)}>
-          <MaterialIcons name={icon} size={20} color={currentTone.color} />
+        <View className={cn("mr-3.5 h-11 w-11 items-center justify-center rounded-xl", currentTone.icon)}>
+          <MaterialIcons name={icon} size={22} color={currentTone.color} />
         </View>
       ) : null}
       <View className="mr-3 flex-1">
@@ -69,7 +92,7 @@ export function ActionRow({
           </Text>
         ) : null}
       </View>
-      {right ?? <MaterialIcons name="chevron-right" size={22} color="#64706d" />}
-    </Pressable>
+      {right ?? <MaterialIcons name="chevron-right" size={22} color="#8b9894" />}
+    </AnimatedPressable>
   );
 }

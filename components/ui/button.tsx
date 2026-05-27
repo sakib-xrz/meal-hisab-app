@@ -1,19 +1,28 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import * as Haptics from "expo-haptics";
 import type { ComponentProps } from "react";
 import {
   ActivityIndicator,
+  Platform,
   Pressable,
   Text,
   View,
   type PressableProps,
 } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
 import { cn } from "@/lib/utils/cn";
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 type ButtonProps = PressableProps & {
   title: string;
   variant?: "primary" | "secondary" | "danger" | "ghost";
-  size?: "md" | "lg";
+  size?: "sm" | "md" | "lg";
   loading?: boolean;
   leftIcon?: ComponentProps<typeof MaterialIcons>["name"];
   rightIcon?: ComponentProps<typeof MaterialIcons>["name"];
@@ -22,10 +31,10 @@ type ButtonProps = PressableProps & {
 };
 
 const variantClasses = {
-  primary: "bg-primary shadow-md shadow-primary/20 active:bg-primary-dark",
-  secondary: "border border-border bg-surface-muted active:bg-border",
-  danger: "bg-danger active:opacity-90",
-  ghost: "bg-transparent active:bg-surface-muted",
+  primary: "bg-primary shadow-md shadow-primary/25",
+  secondary: "border border-border bg-surface-muted",
+  danger: "bg-danger shadow-md shadow-danger/20",
+  ghost: "bg-transparent",
 } as const;
 
 const textVariantClasses = {
@@ -33,6 +42,18 @@ const textVariantClasses = {
   secondary: "text-foreground",
   danger: "text-white",
   ghost: "text-primary",
+} as const;
+
+const sizeClasses = {
+  sm: "px-3 py-2 min-h-9",
+  md: "px-4 py-2.5 min-h-11",
+  lg: "px-5 py-3.5 min-h-[52px]",
+} as const;
+
+const textSizeClasses = {
+  sm: "text-sm",
+  md: "text-base",
+  lg: "text-base",
 } as const;
 
 export function Button({
@@ -45,8 +66,17 @@ export function Button({
   rightIcon,
   className,
   textClassName,
+  onPressIn,
+  onPressOut,
+  onPress,
   ...props
 }: ButtonProps) {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
   const iconColor =
     variant === "primary" || variant === "danger"
       ? "#fffffc"
@@ -54,17 +84,32 @@ export function Button({
         ? "#0f766e"
         : "#16201f";
 
+  const iconSize = size === "sm" ? 16 : 18;
+
   return (
-    <Pressable
+    <AnimatedPressable
+      style={animatedStyle}
       className={cn(
-        "min-h-11 flex-row items-center justify-center rounded-lg",
-        size === "lg" ? "px-5 py-3.5" : "px-4 py-2.5",
+        "flex-row items-center justify-center rounded-xl",
+        sizeClasses[size],
         variantClasses[variant],
         (disabled || loading) && "opacity-50",
-        className
+        className,
       )}
       disabled={disabled || loading}
       accessibilityRole="button"
+      onPressIn={(e: any) => {
+        scale.value = withSpring(0.97, { damping: 15, stiffness: 200 });
+        if (Platform.OS !== "web") {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+        }
+        onPressIn?.(e);
+      }}
+      onPressOut={(e: any) => {
+        scale.value = withSpring(1, { damping: 15, stiffness: 200 });
+        onPressOut?.(e);
+      }}
+      onPress={onPress}
       {...props}
     >
       {loading ? (
@@ -75,25 +120,26 @@ export function Button({
         <>
           {leftIcon ? (
             <View className="mr-2">
-              <MaterialIcons name={leftIcon} size={18} color={iconColor} />
+              <MaterialIcons name={leftIcon} size={iconSize} color={iconColor} />
             </View>
           ) : null}
           <Text
             className={cn(
-              "font-sans text-base font-semibold",
+              "font-sans font-semibold",
+              textSizeClasses[size],
               textVariantClasses[variant],
-              textClassName
+              textClassName,
             )}
           >
             {title}
           </Text>
           {rightIcon ? (
             <View className="ml-2">
-              <MaterialIcons name={rightIcon} size={18} color={iconColor} />
+              <MaterialIcons name={rightIcon} size={iconSize} color={iconColor} />
             </View>
           ) : null}
         </>
       )}
-    </Pressable>
+    </AnimatedPressable>
   );
 }

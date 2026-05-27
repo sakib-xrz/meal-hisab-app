@@ -1,7 +1,9 @@
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 
+import { Brand } from "@/constants/theme";
 import { resolveAssetUrl } from "@/lib/utils/assets";
 import { cn } from "@/lib/utils/cn";
 
@@ -9,6 +11,7 @@ type AvatarProps = {
   name?: string | null;
   uri?: string | null;
   size?: "sm" | "md" | "lg";
+  showRing?: boolean;
   className?: string;
 };
 
@@ -31,7 +34,7 @@ function getInitials(name?: string | null) {
   return `${parts[0][0] ?? ""}${parts[1][0] ?? ""}`.toUpperCase();
 }
 
-export function Avatar({ name, uri, size = "md", className }: AvatarProps) {
+export function Avatar({ name, uri, size = "md", showRing, className }: AvatarProps) {
   const dimension = SIZE_PX[size];
   const resolvedUri = resolveAssetUrl(uri);
   const [failed, setFailed] = useState(false);
@@ -42,11 +45,11 @@ export function Avatar({ name, uri, size = "md", className }: AvatarProps) {
 
   const showImage = Boolean(resolvedUri) && !failed;
 
-  return (
+  const inner = (
     <View
       className={cn(
-        "items-center justify-center overflow-hidden rounded-full border border-primary-soft bg-primary-soft",
-        className
+        "items-center justify-center overflow-hidden rounded-full bg-primary-soft",
+        !showRing && "border border-primary-soft",
       )}
       style={{ width: dimension, height: dimension }}
     >
@@ -66,4 +69,28 @@ export function Avatar({ name, uri, size = "md", className }: AvatarProps) {
       )}
     </View>
   );
+
+  if (showRing) {
+    const ringSize = dimension + 6;
+    return (
+      <View className={cn(className)}>
+        <LinearGradient
+          colors={[Brand.primaryGlow, Brand.primary, Brand.primaryDark]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{
+            width: ringSize,
+            height: ringSize,
+            borderRadius: ringSize / 2,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {inner}
+        </LinearGradient>
+      </View>
+    );
+  }
+
+  return <View className={cn(className)}>{inner}</View>;
 }

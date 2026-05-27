@@ -1,7 +1,16 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Pressable, Text, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
 import { cn } from "@/lib/utils/cn";
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+
 
 type ListRowProps = {
   title: string;
@@ -22,13 +31,18 @@ export function ListRow({
   showChevron,
   className,
 }: ListRowProps) {
+  const scale = useSharedValue(1);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
   const content = (
     <View className={cn("flex-row items-center justify-between py-3.5", className)}>
       <View className="mr-3 flex-1">
         <Text
           className={cn(
             "font-sans text-base font-medium",
-            destructive ? "text-danger" : "text-foreground"
+            destructive ? "text-danger" : "text-foreground",
           )}
         >
           {title}
@@ -39,20 +53,27 @@ export function ListRow({
       </View>
       {right}
       {showChevron ? (
-        <MaterialIcons name="chevron-right" size={22} color="#64706d" />
+        <MaterialIcons name="chevron-right" size={22} color="#8b9894" />
       ) : null}
     </View>
   );
 
   if (onPress) {
     return (
-      <Pressable
-        onPress={onPress}
-        className="active:opacity-70"
-        accessibilityRole="button"
-      >
-        {content}
-      </Pressable>
+      <Animated.View style={animatedStyle}>
+        <AnimatedPressable
+          onPress={onPress}
+          onPressIn={() => {
+            scale.value = withSpring(0.98, { damping: 15, stiffness: 200 });
+          }}
+          onPressOut={() => {
+            scale.value = withSpring(1, { damping: 15, stiffness: 200 });
+          }}
+          accessibilityRole="button"
+        >
+          {content}
+        </AnimatedPressable>
+      </Animated.View>
     );
   }
 

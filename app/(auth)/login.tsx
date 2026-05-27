@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { Text, View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
@@ -55,12 +56,21 @@ export default function LoginScreen() {
     <Screen keyboardAvoid contentClassName="pt-4">
       <BrandHero
         compact
-        className="mb-6"
+        className="mb-8"
         subtitle="Welcome back to your meal ledger"
       />
-      <Card title="Sign in" subtitle="Access your mess dashboard">
-        <View className="gap-4">
-          <View>
+
+      <Card
+        variant="glass"
+        animated
+        animationDelay={200}
+        title="Sign in"
+        subtitle="Access your mess dashboard"
+      >
+        <View className="gap-5">
+          <Animated.View
+            entering={FadeInDown.delay(300).duration(400).springify()}
+          >
             <Label>Phone</Label>
             <Controller
               control={control}
@@ -70,6 +80,7 @@ export default function LoginScreen() {
                   placeholder="Enter your phone number"
                   keyboardType="phone-pad"
                   autoCapitalize="none"
+                  leftIcon="phone"
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -77,9 +88,11 @@ export default function LoginScreen() {
                 />
               )}
             />
-          </View>
+          </Animated.View>
 
-          <View>
+          <Animated.View
+            entering={FadeInDown.delay(400).duration(400).springify()}
+          >
             <Label>Password</Label>
             <Controller
               control={control}
@@ -89,6 +102,7 @@ export default function LoginScreen() {
                   placeholder="Enter your password"
                   passwordToggle
                   secureTextEntry
+                  leftIcon="lock"
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -96,24 +110,33 @@ export default function LoginScreen() {
                 />
               )}
             />
-          </View>
+          </Animated.View>
 
-          <Button
-            title="Sign In"
-            leftIcon="login"
-            loading={isSubmitting}
-            onPress={handleSubmit(onSubmit)}
-          />
+          <Animated.View
+            entering={FadeInDown.delay(500).duration(400).springify()}
+          >
+            <Button
+              title="Sign In"
+              leftIcon="login"
+              size="lg"
+              loading={isSubmitting}
+              onPress={handleSubmit(onSubmit)}
+            />
+          </Animated.View>
 
-          <Text className="text-center font-sans text-sm text-muted">
-            No account?{" "}
-            <Link
-              href="/(auth)/register"
-              className="font-semibold text-primary"
-            >
-              Register
-            </Link>
-          </Text>
+          <Animated.View
+            entering={FadeInDown.delay(600).duration(400).springify()}
+          >
+            <Text className="text-center font-sans text-sm text-muted">
+              No account?{" "}
+              <Link
+                href="/(auth)/register"
+                className="font-semibold text-primary"
+              >
+                Register
+              </Link>
+            </Text>
+          </Animated.View>
         </View>
       </Card>
     </Screen>

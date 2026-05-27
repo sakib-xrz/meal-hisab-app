@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
@@ -64,9 +65,9 @@ export default function CreateMessScreen() {
       keyboardAvoid
       hero={<BrandHero subtitle="Set up your mess and start the monthly count" />}
     >
-      <Card title="Mess details" subtitle="One mess per account">
-        <View className="gap-4">
-          <View>
+      <Card variant="glass" animated animationDelay={200} title="Mess details" subtitle="One mess per account">
+        <View className="gap-5">
+          <Animated.View entering={FadeInDown.delay(300).duration(400).springify()}>
             <Label>Mess name *</Label>
             <Controller
               control={control}
@@ -74,6 +75,7 @@ export default function CreateMessScreen() {
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
                   placeholder="Bashundhara Bachelor Mess"
+                  leftIcon="home"
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -81,9 +83,9 @@ export default function CreateMessScreen() {
                 />
               )}
             />
-          </View>
+          </Animated.View>
 
-          <View>
+          <Animated.View entering={FadeInDown.delay(400).duration(400).springify()}>
             <Label>Address</Label>
             <Controller
               control={control}
@@ -91,15 +93,16 @@ export default function CreateMessScreen() {
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
                   placeholder="Optional"
+                  leftIcon="location-on"
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
                 />
               )}
             />
-          </View>
+          </Animated.View>
 
-          <View>
+          <Animated.View entering={FadeInDown.delay(500).duration(400).springify()}>
             <Label>Contact phone</Label>
             <Controller
               control={control}
@@ -108,30 +111,33 @@ export default function CreateMessScreen() {
                 <Input
                   placeholder="Optional"
                   keyboardType="phone-pad"
+                  leftIcon="phone"
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
                 />
               )}
             />
-          </View>
+          </Animated.View>
 
-          <Button
-            title="Create Mess"
-            leftIcon="add-business"
-            loading={createMessMutation.isPending}
-            onPress={handleSubmit(onSubmit)}
-          />
-
-          <Button
-            title="Sign out"
-            leftIcon="logout"
-            variant="secondary"
-            onPress={async () => {
-              await signOut();
-              router.replace("/(auth)/login");
-            }}
-          />
+          <Animated.View entering={FadeInDown.delay(600).duration(400).springify()} className="gap-3">
+            <Button
+              title="Create Mess"
+              leftIcon="add-business"
+              size="lg"
+              loading={createMessMutation.isPending}
+              onPress={handleSubmit(onSubmit)}
+            />
+            <Button
+              title="Sign out"
+              leftIcon="logout"
+              variant="ghost"
+              onPress={async () => {
+                await signOut();
+                router.replace("/(auth)/login");
+              }}
+            />
+          </Animated.View>
         </View>
       </Card>
     </Screen>

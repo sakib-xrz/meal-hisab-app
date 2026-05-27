@@ -1,5 +1,3 @@
-import "react-native-gesture-handler";
-import "react-native-reanimated";
 import {
   DarkTheme,
   DefaultTheme,
@@ -10,6 +8,8 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import "../global.css";
@@ -104,11 +104,13 @@ function RootNavigator() {
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <QueryProvider>
-        <AuthProvider>
-          <RootNavigator />
-        </AuthProvider>
-      </QueryProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <QueryProvider>
+          <AuthProvider>
+            <RootNavigator />
+          </AuthProvider>
+        </QueryProvider>
+      </GestureHandlerRootView>
     </SafeAreaProvider>
   );
 }

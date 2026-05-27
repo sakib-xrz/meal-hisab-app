@@ -1,25 +1,48 @@
 import { Text, View, type ViewProps } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { cn } from "@/lib/utils/cn";
+
+type CardVariant = "default" | "glass" | "elevated";
 
 type CardProps = ViewProps & {
   title?: string;
   subtitle?: string;
+  variant?: CardVariant;
+  animated?: boolean;
+  animationDelay?: number;
   className?: string;
+};
+
+const variantClasses: Record<CardVariant, string> = {
+  default: "border border-border bg-surface",
+  glass: "border border-glass-border bg-glass",
+  elevated: "border border-border bg-surface-elevated",
 };
 
 export function Card({
   title,
   subtitle,
+  variant = "default",
+  animated = false,
+  animationDelay = 0,
   children,
   className,
   ...props
 }: CardProps) {
+  const Wrapper = animated ? Animated.View : View;
+  const entering = animated
+    ? FadeInDown.delay(animationDelay).duration(400).springify().damping(18)
+    : undefined;
+
   return (
-    <View
+    <Wrapper
+      // @ts-ignore — entering only used on Animated.View
+      entering={entering}
       className={cn(
-        "rounded-lg border border-border bg-surface p-4 shadow-sm shadow-foreground/5",
-        className
+        "rounded-2xl p-4 shadow-sm shadow-foreground/5",
+        variantClasses[variant],
+        className,
       )}
       {...props}
     >
@@ -32,6 +55,6 @@ export function Card({
         <Text className="mb-3 font-sans text-sm text-muted">{subtitle}</Text>
       ) : null}
       {children}
-    </View>
+    </Wrapper>
   );
 }

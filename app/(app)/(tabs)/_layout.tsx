@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
-import { Platform } from "react-native";
+import { Platform, StyleSheet } from "react-native";
+import { BlurView } from "expo-blur";
 
 import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
@@ -16,17 +17,23 @@ export default function TabLayout() {
         tabBarInactiveTintColor: Colors[colorScheme ?? "light"].tabIconDefault,
         headerShown: false,
         tabBarButton: HapticTab,
+        tabBarBackground: () => (
+          <BlurView
+            intensity={85}
+            tint="light"
+            style={StyleSheet.absoluteFill}
+          />
+        ),
         tabBarStyle: {
-          backgroundColor: Brand.surface,
-          borderTopColor: Brand.border,
+          position: "absolute",
+          backgroundColor: "rgba(255, 255, 252, 0.72)",
+          borderTopColor: "rgba(219, 229, 220, 0.55)",
           borderTopWidth: 1,
           height: Platform.OS === "ios" ? 86 : 66,
           paddingTop: 8,
           paddingBottom: Platform.OS === "ios" ? 26 : 10,
-          shadowColor: "#16201f",
-          shadowOpacity: 0.08,
-          shadowRadius: 18,
-          elevation: 12,
+          elevation: 0,
+          shadowOpacity: 0,
         },
         tabBarItemStyle: {
           borderRadius: 8,

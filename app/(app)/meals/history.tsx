@@ -1,5 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Link, router } from "expo-router";
+import { useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -9,11 +10,18 @@ import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { Screen } from "@/components/ui/screen";
+import { ConfirmSheet, useBottomSheetModal } from "@/components/ui/bottom-sheet-modal";
+import { ShimmerCard } from "@/components/ui/shimmer";
+import { FadeIn, StaggerList } from "@/components/ui/animated-view";
 import { useAuth } from "@/context/auth-provider";
 import { ApiError } from "@/lib/api/client";
 import type { MealEntry } from "@/lib/api/types";
 import { useDeleteMealEntry, useMealsList } from "@/lib/queries/meals";
-import { formatDisplayDate, formatShortDate, getMonthRange } from "@/lib/utils/dates";
+import {
+  formatDisplayDate,
+  formatShortDate,
+  getMonthRange,
+} from "@/lib/utils/dates";
 
 function MealHistoryCard({
   entry,
@@ -27,7 +35,7 @@ function MealHistoryCard({
   onDelete: (entry: MealEntry) => void;
 }) {
   return (
-    <Card>
+    <Card variant="glass">
       <View className="mb-3 flex-row items-start justify-between gap-3">
         <View className="flex-1">
           <Text className="mb-1 font-sans text-xs text-muted">
@@ -45,7 +53,9 @@ function MealHistoryCard({
         <Badge label={`D ${entry.dinner}`} variant="default" />
       </View>
       {entry.note ? (
-        <Text className="mt-1 font-sans text-sm italic text-muted">{entry.note}</Text>
+        <Text className="mt-1 font-sans text-sm italic text-muted">
+          {entry.note}
+        </Text>
       ) : null}
 
       {canEdit ? (
@@ -82,6 +92,8 @@ export default function MealHistoryScreen() {
   const { isManagerOrAbove } = useAuth();
   const { from, to } = getMonthRange();
   const deleteMutation = useDeleteMealEntry();
+  const [deleteTarget, setDeleteTarget] = useState<MealEntry | null>(null);
+  const deleteSheet = useBottomSheetModal();
 
   const historyQuery = useMealsList(from, to);
   const entries = historyQuery.data?.entries ?? [];
@@ -94,32 +106,30 @@ export default function MealHistoryScreen() {
   };
 
   const handleDelete = (entry: MealEntry) => {
-    Alert.alert(
-      "Delete meal entry",
-      `Remove ${entry.member.fullName}'s meal on ${formatDisplayDate(entry.mealDate)}?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            deleteMutation.mutate(entry.id, {
-              onSuccess: () => {
-                Toast.show({ type: "success", text1: "Meal entry deleted" });
-              },
-              onError: (err) => {
-                Toast.show({
-                  type: "error",
-                  text1: "Delete failed",
-                  text2: err instanceof ApiError ? err.message : "Something went wrong",
-                });
-              },
-            });
-          },
-        },
-      ],
-    );
+    setDeleteTarget(entry);
+    deleteSheet.open();
   };
+
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+    deleteMutation.mutate(deleteTarget.id, {
+      onSuccess: () => {
+        Toast.show({ type: "success", text1: "Meal entry deleted" });
+        deleteSheet.close();
+        setDeleteTarget(null);
+      },
+      onError: (err) => {
+        Toast.show({
+          type: "error",
+          text1: "Delete failed",
+          text2: err instanceof ApiError ? err.message : "Something went wrong",
+        });
+      },
+    });
+  };
+
+  const showSkeleton =
+    historyQuery.isLoading || (historyQuery.isFetching && entries.length === 0);
 
   return (
     <Screen
@@ -139,19 +149,27 @@ export default function MealHistoryScreen() {
         />
       ) : null}
 
-      <View className="gap-3">
-        {entries.map((entry) => (
-          <MealHistoryCard
-            key={entry.id}
-            entry={entry}
-            canEdit={isManagerOrAbove}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        ))}
-      </View>
-
-      {historyQuery.isSuccess && entries.length === 0 ? (
+      {showSkeleton ? (
+        <View className="gap-3">
+          <ShimmerCard />
+          <ShimmerCard />
+          <ShimmerCard />
+        </View>
+      ) : entries.length > 0 ? (
+        <View className="gap-3.5">
+          <StaggerList staggerMs={40}>
+            {entries.map((entry) => (
+              <MealHistoryCard
+                key={entry.id}
+                entry={entry}
+                canEdit={isManagerOrAbove}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </StaggerList>
+        </View>
+      ) : historyQuery.isSuccess && entries.length === 0 ? (
         <EmptyState
           title="No meal entries"
           description="No meal entries in this period."
@@ -167,6 +185,20 @@ export default function MealHistoryScreen() {
           tone="accent"
         />
       </Link>
+
+      <ConfirmSheet
+        sheetRef={deleteSheet.ref}
+        title="Delete meal entry"
+        description={
+          deleteTarget
+            ? `Remove ${deleteTarget.member.fullName}'s meal on ${formatDisplayDate(deleteTarget.mealDate)}?`
+            : "Remove this meal entry?"
+        }
+        confirmLabel="Delete"
+        variant="danger"
+        loading={deleteMutation.isPending}
+        onConfirm={confirmDelete}
+      />
     </Screen>
   );
 }

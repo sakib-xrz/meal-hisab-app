@@ -1,6 +1,7 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { Pressable, Text, View } from "react-native";
+import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
+import { Platform, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { cn } from "@/lib/utils/cn";
@@ -35,21 +36,21 @@ export function AppHeader({
     }
   };
 
-  return (
+  const content = (
     <View
-      className={cn("border-b border-border bg-background px-4 pb-3", className)}
+      className={cn("border-b border-border/50 px-4 pb-3.5", className)}
       style={{ paddingTop: insets.top + 8 }}
     >
       <View className="flex-row items-center justify-between">
-        <View className="flex-row items-center flex-1 mr-3">
+        <View className="mr-3 flex-1 flex-row items-center">
           {showBack ? (
             <Pressable
               onPress={handleBack}
-              className="mr-3 h-10 w-10 items-center justify-center rounded-lg border border-border bg-surface active:bg-surface-muted"
+              className="mr-3 h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface active:bg-surface-muted"
               accessibilityRole="button"
               accessibilityLabel="Go back"
             >
-              <MaterialIcons name="arrow-back-ios-new" size={18} color="#16201f" />
+              <MaterialIcons name="arrow-back-ios-new" size={17} color="#16201f" />
             </Pressable>
           ) : null}
           <View className="flex-1">
@@ -57,7 +58,7 @@ export function AppHeader({
               {title}
             </Text>
             {subtitle ? (
-              <Text className="font-sans text-sm text-muted" numberOfLines={1}>
+              <Text className="mt-0.5 font-sans text-sm text-muted" numberOfLines={1}>
                 {subtitle}
               </Text>
             ) : null}
@@ -65,6 +66,21 @@ export function AppHeader({
         </View>
         {right}
       </View>
+    </View>
+  );
+
+  // Wrap with BlurView on iOS for frosted effect
+  if (Platform.OS === "ios") {
+    return (
+      <BlurView intensity={80} tint="extraLight" style={{ overflow: "hidden" }}>
+        {content}
+      </BlurView>
+    );
+  }
+
+  return (
+    <View className="bg-background">
+      {content}
     </View>
   );
 }

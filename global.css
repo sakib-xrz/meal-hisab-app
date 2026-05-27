@@ -2,6 +2,7 @@
 @import "uniwind";
 
 @theme {
+  /* ── Core palette (preserved) ── */
   --color-primary: #0f766e;
   --color-primary-soft: #d8f7ee;
   --color-primary-dark: #0b4f4a;
@@ -18,10 +19,32 @@
   --color-info-soft: #dbeafe;
   --color-foreground: #16201f;
   --color-foreground-secondary: #52605e;
+
+  /* ── Premium additions ── */
+  --color-primary-deep: #084c44;
+  --color-primary-glow: #34d399;
+  --color-gradient-start: #0b4f4a;
+  --color-gradient-mid: #0f766e;
+  --color-gradient-end: #14b8a6;
+  --color-glass: rgba(255, 255, 252, 0.72);
+  --color-glass-strong: rgba(255, 255, 252, 0.88);
+  --color-glass-border: rgba(219, 229, 220, 0.55);
+  --color-glass-dark: rgba(11, 79, 74, 0.85);
+  --color-glass-dark-border: rgba(52, 211, 153, 0.18);
+  --color-surface-elevated: #ffffff;
+  --color-shimmer-base: #eef4ef;
+  --color-shimmer-highlight: #f5f8f2;
+
+  /* ── Typography ── */
   --font-sans: "PlusJakartaSans_400Regular";
-  --radius-input: 8px;
-  --radius-card: 8px;
-  --radius-hero: 12px;
+
+  /* ── Radii ── */
+  --radius-input: 12px;
+  --radius-card: 16px;
+  --radius-hero: 20px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
 }
 
 @layer utilities {

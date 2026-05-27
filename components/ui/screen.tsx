@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils/cn";
 type ScreenProps = ScrollViewProps & {
   title?: string;
   subtitle?: string;
+  greeting?: { name?: string | null };
   hero?: React.ReactNode;
   refreshing?: boolean;
   onRefresh?: () => void;
@@ -25,11 +26,20 @@ type ScreenProps = ScrollViewProps & {
   footer?: React.ReactNode;
   contentClassName?: string;
   edges?: ("top" | "bottom" | "left" | "right")[];
+  tabScreen?: boolean;
 };
+
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+}
 
 export function Screen({
   title,
   subtitle,
+  greeting,
   hero,
   children,
   refreshing,
@@ -40,8 +50,10 @@ export function Screen({
   contentClassName,
   className,
   edges = ["top"],
+  tabScreen = false,
   ...props
 }: ScreenProps) {
+  const isIos = Platform.OS === "ios";
   const content = (
     <ScrollView
       style={styles.flex}
@@ -56,23 +68,47 @@ export function Screen({
             onRefresh={onRefresh}
             tintColor={Brand.primary}
             colors={[Brand.primary]}
+            progressBackgroundColor={Brand.surface}
           />
         ) : undefined
       }
       {...props}
     >
-      <View className={cn("px-4 pb-8 pt-2", contentClassName)}>
+      <View
+        className={cn(
+          "px-4 pb-8 pt-2",
+          tabScreen && !footer && (isIos ? "pb-28" : "pb-24"),
+          contentClassName,
+        )}
+      >
         {hero}
+
+        {/* Greeting header */}
+        {greeting ? (
+          <View className="mb-1 mt-3">
+            <Text className="font-sans text-base text-muted">
+              {getGreeting()}{greeting.name ? "," : ""} 👋
+            </Text>
+            {greeting.name ? (
+              <Text className="mt-0.5 font-sans text-2xl font-bold text-foreground">
+                {greeting.name}
+              </Text>
+            ) : null}
+          </View>
+        ) : null}
+
+        {/* Standard title */}
         {title ? (
           <Text className="mb-1 mt-2 font-sans text-3xl font-bold text-foreground">
             {title}
           </Text>
         ) : null}
         {subtitle ? (
-          <Text className="mb-4 font-sans text-base text-muted">
+          <Text className="mb-5 font-sans text-base text-muted">
             {subtitle}
           </Text>
         ) : null}
+
         {children}
       </View>
     </ScrollView>
@@ -92,7 +128,10 @@ export function Screen({
         content
       )}
       {footer ? (
-        <View className="border-t border-border bg-surface px-4 pb-4 pt-3 shadow-lg shadow-foreground/5">
+        <View
+          style={tabScreen ? { paddingBottom: isIos ? 32 : 16 } : undefined}
+          className="border-t border-border/50 bg-surface px-4 pb-4 pt-3 shadow-lg shadow-foreground/5"
+        >
           {footer}
         </View>
       ) : null}
@@ -110,7 +149,7 @@ export function LoadingScreen({
       style={styles.flex}
       className="flex-1 items-center justify-center bg-background px-8"
     >
-      <BrandMark size="lg" variant="soft" className="mb-5" />
+      <BrandMark size="lg" variant="gradient" className="mb-5" />
       <ActivityIndicator size="large" color={Brand.primary} />
       <Text className="mt-3 font-sans text-base text-muted">{message}</Text>
     </SafeAreaView>
