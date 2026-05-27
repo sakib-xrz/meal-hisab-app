@@ -118,6 +118,8 @@ export default function MembersScreen() {
             options={STATUS_FILTERS}
             value={statusFilter}
             onChange={setStatusFilter}
+            variant="glass"
+            size="sm"
           />
           <Input
             placeholder="Search by name"

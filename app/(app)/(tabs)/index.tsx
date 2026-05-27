@@ -135,13 +135,13 @@ export default function DashboardScreen() {
         <FadeIn delay={300}>
           <Card variant="glass" title="Mess info" className="mb-5">
             {mess.address ? (
-              <Text className="mb-1 font-sans text-base text-muted">
+              <Text className="mb-1 font-sans text-sm text-muted italic">
                 {mess.address}
               </Text>
             ) : null}
             {mess.phone ? (
               <Text className="mb-1 font-sans text-base text-muted">
-                {mess.phone}
+                Phone: {mess.phone}
               </Text>
             ) : null}
             {mess.owner ? (
@@ -156,13 +156,6 @@ export default function DashboardScreen() {
                 pill
                 icon="people"
               />
-              {stats ? (
-                <Badge
-                  label={`${formatBdt(stats.totalExtraExpense)} extra`}
-                  variant="accent"
-                  pill
-                />
-              ) : null}
             </View>
           </Card>
         </FadeIn>

@@ -79,7 +79,7 @@ export function Screen({
 
         {/* Greeting header */}
         {greeting ? (
-          <View className="mb-1 mt-3">
+          <View className="mb-2 mt-3">
             <Text className="font-sans text-base text-muted">
               {getGreeting()}
               {greeting.name ? "," : ""} 👋
