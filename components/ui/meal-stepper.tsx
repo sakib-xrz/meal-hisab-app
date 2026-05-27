@@ -3,7 +3,7 @@ import { Platform, Pressable, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withTiming,
 } from "react-native-reanimated";
 
 import { cn } from "@/lib/utils/cn";
@@ -41,8 +41,8 @@ export function MealStepper({
 
   const toggle = () => {
     const next = current === 0 ? 1 : 0;
-    scale.value = withSpring(0.85, { damping: 12, stiffness: 300 }, () => {
-      scale.value = withSpring(1, { damping: 10, stiffness: 200 });
+    scale.value = withTiming(0.85, { duration: 80 }, () => {
+      scale.value = withTiming(1, { duration: 80 });
     });
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});

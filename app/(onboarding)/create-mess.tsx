@@ -67,7 +67,7 @@ export default function CreateMessScreen() {
     >
       <Card variant="glass" animated animationDelay={200} title="Mess details" subtitle="One mess per account">
         <View className="gap-5">
-          <Animated.View entering={FadeInDown.delay(300).duration(400).springify()}>
+          <Animated.View entering={FadeInDown.delay(300).duration(400)}>
             <Label>Mess name *</Label>
             <Controller
               control={control}
@@ -85,7 +85,7 @@ export default function CreateMessScreen() {
             />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(400).duration(400).springify()}>
+          <Animated.View entering={FadeInDown.delay(400).duration(400)}>
             <Label>Address</Label>
             <Controller
               control={control}
@@ -102,7 +102,7 @@ export default function CreateMessScreen() {
             />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(500).duration(400).springify()}>
+          <Animated.View entering={FadeInDown.delay(500).duration(400)}>
             <Label>Contact phone</Label>
             <Controller
               control={control}
@@ -120,7 +120,7 @@ export default function CreateMessScreen() {
             />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(600).duration(400).springify()} className="gap-3">
+          <Animated.View entering={FadeInDown.delay(600).duration(400)} className="gap-3">
             <Button
               title="Create Mess"
               leftIcon="add-business"

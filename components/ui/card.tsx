@@ -32,7 +32,7 @@ export function Card({
 }: CardProps) {
   const Wrapper = animated ? Animated.View : View;
   const entering = animated
-    ? FadeInDown.delay(animationDelay).duration(400).springify().damping(18)
+    ? FadeInDown.delay(animationDelay).duration(400)
     : undefined;
 
   return (

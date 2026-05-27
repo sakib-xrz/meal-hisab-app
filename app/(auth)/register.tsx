@@ -56,7 +56,7 @@ export default function RegisterScreen() {
 
       <Card variant="glass" animated animationDelay={200} title="Create account" subtitle="Start with a secure profile">
         <View className="gap-5">
-          <Animated.View entering={FadeInDown.delay(300).duration(400).springify()}>
+          <Animated.View entering={FadeInDown.delay(300).duration(400)}>
             <Label>Full name</Label>
             <Controller
               control={control}
@@ -74,7 +74,7 @@ export default function RegisterScreen() {
             />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(400).duration(400).springify()}>
+          <Animated.View entering={FadeInDown.delay(400).duration(400)}>
             <Label>Phone</Label>
             <Controller
               control={control}
@@ -94,7 +94,7 @@ export default function RegisterScreen() {
             />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(500).duration(400).springify()}>
+          <Animated.View entering={FadeInDown.delay(500).duration(400)}>
             <Label>Password</Label>
             <Controller
               control={control}
@@ -114,7 +114,7 @@ export default function RegisterScreen() {
             />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(600).duration(400).springify()}>
+          <Animated.View entering={FadeInDown.delay(600).duration(400)}>
             <Button
               title="Register"
               leftIcon="person-add-alt-1"
@@ -124,7 +124,7 @@ export default function RegisterScreen() {
             />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(700).duration(400).springify()}>
+          <Animated.View entering={FadeInDown.delay(700).duration(400)}>
             <Text className="text-center font-sans text-sm text-muted">
               Already have an account?{" "}
               <Link href="/(auth)/login" className="font-semibold text-primary">

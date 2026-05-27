@@ -12,7 +12,7 @@ import {
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withTiming,
 } from "react-native-reanimated";
 
 import { cn } from "@/lib/utils/cn";
@@ -99,14 +99,14 @@ export function Button({
       disabled={disabled || loading}
       accessibilityRole="button"
       onPressIn={(e: any) => {
-        scale.value = withSpring(0.97, { damping: 15, stiffness: 200 });
+        scale.value = withTiming(0.97, { duration: 100 });
         if (Platform.OS !== "web") {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
         }
         onPressIn?.(e);
       }}
       onPressOut={(e: any) => {
-        scale.value = withSpring(1, { damping: 15, stiffness: 200 });
+        scale.value = withTiming(1, { duration: 100 });
         onPressOut?.(e);
       }}
       onPress={onPress}

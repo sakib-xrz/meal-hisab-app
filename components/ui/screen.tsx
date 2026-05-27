@@ -1,3 +1,5 @@
+import { BottomTabBarHeightContext } from "@react-navigation/bottom-tabs";
+import { useContext } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -51,6 +53,8 @@ export function Screen({
   edges = ["top"],
   ...props
 }: ScreenProps) {
+  const tabBarHeight = useContext(BottomTabBarHeightContext) ?? 0;
+
   const content = (
     <ScrollView
       style={styles.flex}
@@ -72,10 +76,8 @@ export function Screen({
       {...props}
     >
       <View
-        className={cn(
-          "px-4 pb-8 pt-2",
-          contentClassName,
-        )}
+        className={cn("px-4 pt-2", contentClassName)}
+        style={{ paddingBottom: 24 + tabBarHeight }}
       >
         {hero}
 

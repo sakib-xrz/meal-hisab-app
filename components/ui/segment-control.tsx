@@ -3,7 +3,7 @@ import { Pressable, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withTiming,
 } from "react-native-reanimated";
 
 import { cn } from "@/lib/utils/cn";
@@ -36,7 +36,7 @@ export function SegmentControl<T extends string>({
   useEffect(() => {
     const idx = options.findIndex((o) => o.value === value);
     if (idx >= 0) {
-      indicatorLeft.value = withSpring(idx, { damping: 18, stiffness: 160 });
+      indicatorLeft.value = withTiming(idx, { duration: 200 });
     }
   }, [value, options, indicatorLeft]);
 

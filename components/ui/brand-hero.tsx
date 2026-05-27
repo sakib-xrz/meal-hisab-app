@@ -34,7 +34,7 @@ export function BrandHero({
 
   return (
     <Animated.View
-      entering={FadeInDown.duration(500).springify().damping(18)}
+      entering={FadeInDown.duration(500)}
       className={cn("mx-4 mb-8 mt-6 overflow-hidden rounded-2xl shadow-lg shadow-primary-dark/20", className)}
     >
       <LinearGradient

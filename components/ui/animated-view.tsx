@@ -5,8 +5,7 @@ import Animated, {
   FadeInUp,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
-  type AnimatedProps,
+  withTiming,
 } from "react-native-reanimated";
 
 import { cn } from "@/lib/utils/cn";
@@ -29,8 +28,8 @@ export function FadeIn({
 }: FadeInProps) {
   const Entering =
     direction === "up"
-      ? FadeInDown.delay(delay).duration(duration).springify().damping(18)
-      : FadeInUp.delay(delay).duration(duration).springify().damping(18);
+      ? FadeInDown.delay(delay).duration(duration)
+      : FadeInUp.delay(delay).duration(duration);
 
   return (
     <Animated.View entering={Entering} className={className}>
@@ -96,11 +95,11 @@ export function ScalePress({
     <Animated.View style={animatedStyle} className={cn(className)}>
       <Pressable
         onPressIn={(e) => {
-          scale.value = withSpring(scaleValue, { damping: 15, stiffness: 200 });
+          scale.value = withTiming(scaleValue, { duration: 100 });
           onPressIn?.(e);
         }}
         onPressOut={(e) => {
-          scale.value = withSpring(1, { damping: 15, stiffness: 200 });
+          scale.value = withTiming(1, { duration: 100 });
           onPressOut?.(e);
         }}
         {...props}

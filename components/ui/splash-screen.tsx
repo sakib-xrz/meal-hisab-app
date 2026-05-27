@@ -11,7 +11,6 @@ import Animated, {
   withDelay,
   withRepeat,
   withSequence,
-  withSpring,
   withTiming,
 } from "react-native-reanimated";
 
@@ -28,7 +27,7 @@ export function AppSplashScreen() {
 
   useEffect(() => {
     // Logo entrance
-    logoScale.value = withSpring(1, { damping: 12, stiffness: 100 });
+    logoScale.value = withTiming(1, { duration: 600 });
     logoOpacity.value = withTiming(1, { duration: 600 });
 
     // Glow pulse
@@ -136,7 +135,7 @@ export function AppSplashScreen() {
 
           {/* App name */}
           <Animated.Text
-            entering={FadeInDown.delay(300).duration(500).springify()}
+            entering={FadeInDown.delay(300).duration(500)}
             className="text-center font-sans text-3xl font-bold text-white"
           >
             Meal Hisab
@@ -144,7 +143,7 @@ export function AppSplashScreen() {
 
           {/* Tagline */}
           <Animated.Text
-            entering={FadeInDown.delay(500).duration(500).springify()}
+            entering={FadeInDown.delay(500).duration(500)}
             className="mt-2 text-center font-sans text-sm tracking-wider text-white/70"
           >
             Count every meal

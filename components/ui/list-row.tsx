@@ -3,7 +3,7 @@ import { Pressable, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withTiming,
 } from "react-native-reanimated";
 
 import { cn } from "@/lib/utils/cn";
@@ -64,10 +64,10 @@ export function ListRow({
         <AnimatedPressable
           onPress={onPress}
           onPressIn={() => {
-            scale.value = withSpring(0.98, { damping: 15, stiffness: 200 });
+            scale.value = withTiming(0.98, { duration: 100 });
           }}
           onPressOut={() => {
-            scale.value = withSpring(1, { damping: 15, stiffness: 200 });
+            scale.value = withTiming(1, { duration: 100 });
           }}
           accessibilityRole="button"
         >

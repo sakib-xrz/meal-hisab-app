@@ -69,7 +69,7 @@ export default function LoginScreen() {
       >
         <View className="gap-5">
           <Animated.View
-            entering={FadeInDown.delay(300).duration(400).springify()}
+            entering={FadeInDown.delay(300).duration(400)}
           >
             <Label>Phone</Label>
             <Controller
@@ -91,7 +91,7 @@ export default function LoginScreen() {
           </Animated.View>
 
           <Animated.View
-            entering={FadeInDown.delay(400).duration(400).springify()}
+            entering={FadeInDown.delay(400).duration(400)}
           >
             <Label>Password</Label>
             <Controller
@@ -113,7 +113,7 @@ export default function LoginScreen() {
           </Animated.View>
 
           <Animated.View
-            entering={FadeInDown.delay(500).duration(400).springify()}
+            entering={FadeInDown.delay(500).duration(400)}
           >
             <Button
               title="Sign In"
@@ -125,7 +125,7 @@ export default function LoginScreen() {
           </Animated.View>
 
           <Animated.View
-            entering={FadeInDown.delay(600).duration(400).springify()}
+            entering={FadeInDown.delay(600).duration(400)}
           >
             <Text className="text-center font-sans text-sm text-muted">
               No account?{" "}

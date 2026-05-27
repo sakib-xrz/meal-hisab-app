@@ -1,7 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
-import { Platform, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { cn } from "@/lib/utils/cn";
@@ -69,17 +68,8 @@ export function AppHeader({
     </View>
   );
 
-  // Wrap with BlurView on iOS for frosted effect
-  if (Platform.OS === "ios") {
-    return (
-      <BlurView intensity={80} tint="extraLight" style={{ overflow: "hidden" }}>
-        {content}
-      </BlurView>
-    );
-  }
-
   return (
-    <View className="bg-background">
+    <View className="overflow-hidden border-b border-glass-border bg-glass">
       {content}
     </View>
   );

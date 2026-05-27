@@ -44,7 +44,7 @@ export default function DashboardScreen() {
     >
       {/* Hero card with gradient */}
       <Animated.View
-        entering={FadeInDown.delay(100).duration(500).springify().damping(18)}
+        entering={FadeInDown.delay(100).duration(500)}
         className="mb-5 overflow-hidden rounded-2xl shadow-lg shadow-primary-dark/25"
       >
         <LinearGradient
