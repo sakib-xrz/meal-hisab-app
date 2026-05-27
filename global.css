@@ -2,23 +2,26 @@
 @import "uniwind";
 
 @theme {
-  --color-primary: #0d9488;
-  --color-primary-soft: #ccfbf1;
-  --color-primary-dark: #0f766e;
-  --color-accent: #f59e0b;
-  --color-accent-soft: #fef3c7;
-  --color-surface: #ffffff;
-  --color-background: #f8fafc;
-  --color-muted: #64748b;
-  --color-border: #e2e8f0;
-  --color-danger: #e11d48;
-  --color-danger-soft: #ffe4e6;
-  --color-foreground: #0f172a;
-  --color-foreground-secondary: #475569;
+  --color-primary: #0f766e;
+  --color-primary-soft: #d8f7ee;
+  --color-primary-dark: #0b4f4a;
+  --color-accent: #f3a83b;
+  --color-accent-soft: #fff3cf;
+  --color-surface: #fffffc;
+  --color-surface-muted: #eef4ef;
+  --color-background: #f5f8f2;
+  --color-muted: #64706d;
+  --color-border: #dbe5dc;
+  --color-danger: #d9385e;
+  --color-danger-soft: #ffe8ee;
+  --color-info: #2563eb;
+  --color-info-soft: #dbeafe;
+  --color-foreground: #16201f;
+  --color-foreground-secondary: #52605e;
   --font-sans: "PlusJakartaSans_400Regular";
-  --radius-input: 12px;
-  --radius-card: 16px;
-  --radius-hero: 20px;
+  --radius-input: 8px;
+  --radius-card: 8px;
+  --radius-hero: 12px;
 }
 
 @layer utilities {

@@ -1,3 +1,4 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -36,7 +37,7 @@ export function AppHeader({
 
   return (
     <View
-      className={cn("border-b border-border bg-surface px-4 pb-3", className)}
+      className={cn("border-b border-border bg-background px-4 pb-3", className)}
       style={{ paddingTop: insets.top + 8 }}
     >
       <View className="flex-row items-center justify-between">
@@ -44,11 +45,11 @@ export function AppHeader({
           {showBack ? (
             <Pressable
               onPress={handleBack}
-              className="mr-3 h-10 w-10 items-center justify-center rounded-xl bg-slate-100 active:bg-slate-200"
+              className="mr-3 h-10 w-10 items-center justify-center rounded-lg border border-border bg-surface active:bg-surface-muted"
               accessibilityRole="button"
               accessibilityLabel="Go back"
             >
-              <Text className="text-xl text-foreground">‹</Text>
+              <MaterialIcons name="arrow-back-ios-new" size={18} color="#16201f" />
             </Pressable>
           ) : null}
           <View className="flex-1">

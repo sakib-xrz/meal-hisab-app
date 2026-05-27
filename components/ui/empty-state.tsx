@@ -1,3 +1,4 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Text, View } from "react-native";
 
 import { Button } from "@/components/ui/button";
@@ -20,8 +21,8 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <View className={cn("items-center px-4 py-12", className)}>
-      <View className="mb-4 h-16 w-16 items-center justify-center rounded-2xl bg-primary-soft">
-        <Text className="text-2xl">📋</Text>
+      <View className="mb-4 h-16 w-16 items-center justify-center rounded-lg bg-primary-soft">
+        <MaterialIcons name="inbox" size={28} color="#0b4f4a" />
       </View>
       <Text className="mb-2 text-center font-sans text-lg font-semibold text-foreground">
         {title}
@@ -30,7 +31,12 @@ export function EmptyState({
         <Text className="mb-6 text-center font-sans text-base text-muted">{description}</Text>
       ) : null}
       {actionLabel && onAction ? (
-        <Button title={actionLabel} onPress={onAction} variant="secondary" />
+        <Button
+          title={actionLabel}
+          leftIcon="add"
+          onPress={onAction}
+          variant="secondary"
+        />
       ) : null}
     </View>
   );

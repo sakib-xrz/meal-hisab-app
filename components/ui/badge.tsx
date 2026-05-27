@@ -11,11 +11,11 @@ type BadgeProps = {
 };
 
 const containerClasses: Record<BadgeVariant, string> = {
-  default: "bg-slate-100",
+  default: "bg-surface-muted",
   primary: "bg-primary-soft",
   accent: "bg-accent-soft",
   danger: "bg-danger-soft",
-  muted: "bg-slate-100",
+  muted: "bg-surface-muted",
 };
 
 const textClasses: Record<BadgeVariant, string> = {
@@ -29,11 +29,11 @@ const textClasses: Record<BadgeVariant, string> = {
 export function Badge({ label, variant = "default", className }: BadgeProps) {
   return (
     <View
-      className={cn("self-start rounded-full px-2.5 py-1", containerClasses[variant], className)}
+      className={cn("self-start rounded-md px-2.5 py-1", containerClasses[variant], className)}
     >
       <Text
         className={cn(
-          "font-sans text-xs font-semibold uppercase tracking-wide",
+          "font-sans text-xs font-semibold",
           textClasses[variant]
         )}
       >

@@ -46,9 +46,13 @@ export default function RegisterScreen() {
   };
 
   return (
-    <Screen keyboardAvoid contentClassName="pt-0">
-      <BrandHero compact className="mb-4" />
-      <Card title="Create account" subtitle="Register to get started">
+    <Screen keyboardAvoid contentClassName="pt-4">
+      <BrandHero
+        compact
+        className="mb-6"
+        subtitle="Create your mess account in minutes"
+      />
+      <Card title="Create account" subtitle="Start with a secure profile">
         <View className="gap-4">
           <View>
             <Label>Full name</Label>
@@ -107,6 +111,7 @@ export default function RegisterScreen() {
 
           <Button
             title="Register"
+            leftIcon="person-add-alt-1"
             loading={isSubmitting}
             onPress={handleSubmit(onSubmit)}
           />

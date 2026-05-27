@@ -1,5 +1,6 @@
 import { Text, View } from "react-native";
 
+import { BrandMark } from "@/components/ui/brand-mark";
 import { cn } from "@/lib/utils/cn";
 
 type BrandHeroProps = {
@@ -17,10 +18,8 @@ export function BrandHero({
 }: BrandHeroProps) {
   if (compact) {
     return (
-      <View className={cn("items-center px-4 pt-6 pb-2", className)}>
-        <View className="mb-3 h-14 w-14 items-center justify-center rounded-2xl bg-primary-soft">
-          <Text className="text-2xl">🍽️</Text>
-        </View>
+      <View className={cn("items-center px-4 pb-2 pt-6", className)}>
+        <BrandMark size="lg" variant="solid" className="mb-3" />
         <Text className="font-sans text-2xl font-bold text-foreground">{title}</Text>
         <Text className="mt-1 text-center font-sans text-sm text-muted">{subtitle}</Text>
       </View>
@@ -30,15 +29,22 @@ export function BrandHero({
   return (
     <View
       className={cn(
-        "mx-4 mb-8 mt-6 items-center rounded-[20px] bg-primary px-6 py-10",
+        "mx-4 mb-8 mt-6 overflow-hidden rounded-xl bg-primary-dark px-5 py-6 shadow-lg shadow-primary-dark/20",
         className
       )}
     >
-      <View className="mb-4 h-20 w-20 items-center justify-center rounded-2xl bg-white/20">
-        <Text className="text-4xl">🍽️</Text>
+      <View className="mb-6 flex-row items-center justify-between self-stretch">
+        <BrandMark size="lg" variant="light" />
+        <View className="rounded-md bg-accent px-3 py-1.5">
+          <Text className="font-sans text-xs font-bold text-foreground">Mess ready</Text>
+        </View>
       </View>
-      <Text className="font-sans text-3xl font-bold text-white">{title}</Text>
-      <Text className="mt-2 text-center font-sans text-base text-white/85">{subtitle}</Text>
+      <Text className="self-stretch font-sans text-3xl font-bold text-white">
+        {title}
+      </Text>
+      <Text className="mt-2 self-stretch font-sans text-base leading-6 text-white/80">
+        {subtitle}
+      </Text>
     </View>
   );
 }

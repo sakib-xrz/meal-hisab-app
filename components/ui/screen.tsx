@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { BrandMark } from "@/components/ui/brand-mark";
 import { Brand } from "@/constants/theme";
 import { cn } from "@/lib/utils/cn";
 
@@ -43,10 +44,11 @@ export function Screen({
 }: ScreenProps) {
   const content = (
     <ScrollView
-      style={styles.scroll}
-      className={className}
+      style={styles.flex}
+      className={cn("flex-1 bg-background", className)}
       contentContainerStyle={contentContainerStyle}
       keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
       refreshControl={
         onRefresh ? (
           <RefreshControl
@@ -59,10 +61,10 @@ export function Screen({
       }
       {...props}
     >
-      <View className={cn("px-4 pb-8", contentClassName)}>
+      <View className={cn("px-4 pb-8 pt-2", contentClassName)}>
         {hero}
         {title ? (
-          <Text className="mt-2 mb-1 font-sans text-2xl font-bold text-foreground">
+          <Text className="mb-1 mt-2 font-sans text-3xl font-bold text-foreground">
             {title}
           </Text>
         ) : null}
@@ -77,10 +79,11 @@ export function Screen({
   );
 
   return (
-    <SafeAreaView style={styles.safe} className="bg-background" edges={edges}>
+    <SafeAreaView style={styles.flex} className="flex-1 bg-background" edges={edges}>
       {keyboardAvoid ? (
         <KeyboardAvoidingView
           style={styles.flex}
+          className="flex-1"
           behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
           {content}
@@ -89,7 +92,7 @@ export function Screen({
         content
       )}
       {footer ? (
-        <View className="border-t border-border bg-background px-4 pt-3 pb-4">
+        <View className="border-t border-border bg-surface px-4 pb-4 pt-3 shadow-lg shadow-foreground/5">
           {footer}
         </View>
       ) : null}
@@ -104,23 +107,18 @@ export function LoadingScreen({
 }) {
   return (
     <SafeAreaView
-      style={styles.safe}
-      className="items-center justify-center bg-background"
+      style={styles.flex}
+      className="flex-1 items-center justify-center bg-background px-8"
     >
-      <ActivityIndicator size="large" color="#0d9488" />
+      <BrandMark size="lg" variant="soft" className="mb-5" />
+      <ActivityIndicator size="large" color={Brand.primary} />
       <Text className="mt-3 font-sans text-base text-muted">{message}</Text>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-  },
   flex: {
-    flex: 1,
-  },
-  scroll: {
     flex: 1,
   },
 });

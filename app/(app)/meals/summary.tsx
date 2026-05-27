@@ -1,8 +1,10 @@
 import { Text, View } from "react-native";
 
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
+import { MetricTile } from "@/components/ui/metric-tile";
 import { Screen } from "@/components/ui/screen";
 import { SectionHeader } from "@/components/ui/section-header";
 import { useMealsSummary } from "@/lib/queries/meals";
@@ -18,7 +20,7 @@ export default function MealSummaryScreen() {
   return (
     <Screen
       edges={[]}
-      subtitle={`${formatShortDate(from)} – ${formatShortDate(to)}`}
+      subtitle={`${formatShortDate(from)} - ${formatShortDate(to)}`}
       refreshing={summaryQuery.isRefetching}
       onRefresh={() => summaryQuery.refetch()}
     >
@@ -35,23 +37,29 @@ export default function MealSummaryScreen() {
 
       {summary ? (
         <>
-          <Card className="mb-4">
-            <Text className="font-sans text-2xl font-bold text-foreground">
-              {summary.totalMeals}
-            </Text>
-            <Text className="font-sans text-sm text-muted">Total meals this month</Text>
-          </Card>
+          <MetricTile
+            label="Total meals this month"
+            value={String(summary.totalMeals)}
+            icon="restaurant"
+            tone="accent"
+            className="mb-4"
+          />
 
           <SectionHeader title="By member" className="mt-0" />
           <View className="mb-4 gap-2">
             {summary.byMember.map((m) => (
               <Card key={m.memberId}>
-                <Text className="font-sans text-base font-semibold text-foreground">
-                  {m.fullName}
-                </Text>
-                <Text className="mt-1 font-sans text-sm text-muted">
-                  B: {m.breakfast} · L: {m.lunch} · D: {m.dinner} · Total: {m.total}
-                </Text>
+                <View className="mb-3 flex-row items-center justify-between gap-3">
+                  <Text className="flex-1 font-sans text-base font-semibold text-foreground">
+                    {m.fullName}
+                  </Text>
+                  <Badge label={`${m.total} total`} variant="primary" />
+                </View>
+                <View className="flex-row flex-wrap gap-2">
+                  <Badge label={`B ${m.breakfast}`} variant="muted" />
+                  <Badge label={`L ${m.lunch}`} variant="accent" />
+                  <Badge label={`D ${m.dinner}`} variant="default" />
+                </View>
               </Card>
             ))}
           </View>
@@ -60,12 +68,17 @@ export default function MealSummaryScreen() {
           <View className="gap-2">
             {summary.byDate.map((d) => (
               <Card key={d.date}>
-                <Text className="font-sans text-base font-semibold text-foreground">
-                  {formatDisplayDate(d.date)}
-                </Text>
-                <Text className="mt-1 font-sans text-sm text-muted">
-                  B: {d.breakfast} · L: {d.lunch} · D: {d.dinner} · Total: {d.total}
-                </Text>
+                <View className="mb-3 flex-row items-center justify-between gap-3">
+                  <Text className="flex-1 font-sans text-base font-semibold text-foreground">
+                    {formatDisplayDate(d.date)}
+                  </Text>
+                  <Badge label={`${d.total} total`} variant="primary" />
+                </View>
+                <View className="flex-row flex-wrap gap-2">
+                  <Badge label={`B ${d.breakfast}`} variant="muted" />
+                  <Badge label={`L ${d.lunch}`} variant="accent" />
+                  <Badge label={`D ${d.dinner}`} variant="default" />
+                </View>
               </Card>
             ))}
           </View>

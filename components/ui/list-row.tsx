@@ -1,3 +1,4 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Pressable, Text, View } from "react-native";
 
 import { cn } from "@/lib/utils/cn";
@@ -37,7 +38,9 @@ export function ListRow({
         ) : null}
       </View>
       {right}
-      {showChevron ? <Text className="font-sans text-lg text-muted">›</Text> : null}
+      {showChevron ? (
+        <MaterialIcons name="chevron-right" size={22} color="#64706d" />
+      ) : null}
     </View>
   );
 

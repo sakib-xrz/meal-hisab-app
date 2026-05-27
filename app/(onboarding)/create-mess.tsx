@@ -62,7 +62,7 @@ export default function CreateMessScreen() {
   return (
     <Screen
       keyboardAvoid
-      hero={<BrandHero subtitle="Set up your mess to start tracking meals" />}
+      hero={<BrandHero subtitle="Set up your mess and start the monthly count" />}
     >
       <Card title="Mess details" subtitle="One mess per account">
         <View className="gap-4">
@@ -118,12 +118,14 @@ export default function CreateMessScreen() {
 
           <Button
             title="Create Mess"
+            leftIcon="add-business"
             loading={createMessMutation.isPending}
             onPress={handleSubmit(onSubmit)}
           />
 
           <Button
             title="Sign out"
+            leftIcon="logout"
             variant="secondary"
             onPress={async () => {
               await signOut();

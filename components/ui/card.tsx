@@ -18,13 +18,13 @@ export function Card({
   return (
     <View
       className={cn(
-        "rounded-2xl border border-border bg-surface p-4 shadow-sm shadow-black/5",
+        "rounded-lg border border-border bg-surface p-4 shadow-sm shadow-foreground/5",
         className
       )}
       {...props}
     >
       {title ? (
-        <Text className="mb-1 font-sans text-lg font-semibold text-foreground">
+        <Text className="mb-1 font-sans text-lg font-bold text-foreground">
           {title}
         </Text>
       ) : null}

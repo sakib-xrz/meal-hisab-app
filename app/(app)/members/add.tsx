@@ -195,6 +195,7 @@ export default function AddMemberScreen() {
 
           <Button
             title="Add member"
+            leftIcon="person-add-alt-1"
             loading={addMutation.isPending}
             onPress={handleSubmit(onSubmit)}
           />

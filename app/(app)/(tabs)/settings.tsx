@@ -318,12 +318,6 @@ export default function SettingsScreen() {
   return (
     <Screen title="Settings">
       <Card className="mb-4">
-        <SectionHeader title="Account" className="mt-0" />
-        <Text className="mb-1 font-sans text-sm text-muted">{user?.phone}</Text>
-        {myRole ? (
-          <Badge label={myRole} variant="primary" className="mb-4" />
-        ) : null}
-
         <View className="mb-4 flex-row items-center gap-4">
           <Avatar
             name={user?.name}
@@ -331,21 +325,39 @@ export default function SettingsScreen() {
             size="lg"
             key={user?.id ?? "avatar"}
           />
-          <View className="flex-1 gap-2">
+          <View className="flex-1">
+            <Text className="font-sans text-xl font-bold text-foreground" numberOfLines={1}>
+              {user?.name ?? "Your profile"}
+            </Text>
+            <Text className="mt-1 font-sans text-sm text-muted" numberOfLines={1}>
+              {user?.phone}
+            </Text>
+            {myRole ? (
+              <Badge label={myRole} variant="primary" className="mt-2" />
+            ) : null}
+          </View>
+        </View>
+
+        <View className="mb-4 flex-row gap-2">
+          <View className="flex-1">
             <Button
               title="Change photo"
               variant="secondary"
+              leftIcon="photo-camera"
               loading={updateAvatarMutation.isPending}
               onPress={pickAvatar}
             />
-            {user?.avatarUrl ? (
+          </View>
+          {user?.avatarUrl ? (
+            <View className="flex-1">
               <Button
-                title="Remove photo"
+                title="Remove"
                 variant="ghost"
+                leftIcon="delete-outline"
                 onPress={handleDeleteAvatar}
               />
-            ) : null}
-          </View>
+            </View>
+          ) : null}
         </View>
 
         <Label>Name</Label>
@@ -365,6 +377,7 @@ export default function SettingsScreen() {
           <Button
             title="Save profile"
             variant="secondary"
+            leftIcon="save"
             loading={updateProfileMutation.isPending}
             onPress={profileForm.handleSubmit(onSaveProfile)}
           />
@@ -377,6 +390,7 @@ export default function SettingsScreen() {
             showPasswordForm ? "Cancel password change" : "Change password"
           }
           variant="secondary"
+          leftIcon={showPasswordForm ? "close" : "lock-reset"}
           onPress={() => setShowPasswordForm((v) => !v)}
         />
         {showPasswordForm ? (
@@ -423,6 +437,7 @@ export default function SettingsScreen() {
             />
             <Button
               title="Update password"
+              leftIcon="key"
               loading={changePasswordMutation.isPending}
               onPress={passwordForm.handleSubmit(onChangePassword)}
             />
@@ -452,7 +467,7 @@ export default function SettingsScreen() {
             </Text>
           ) : null}
           <Badge
-            label={`${messQuery.data.activeMemberCount ?? 0} active · ${messQuery.data.isActive ? "Active" : "Inactive"}`}
+            label={`${messQuery.data.activeMemberCount ?? 0} active - ${messQuery.data.isActive ? "Active" : "Inactive"}`}
             variant="muted"
           />
         </Card>
@@ -464,6 +479,7 @@ export default function SettingsScreen() {
           <Button
             title={showMessForm ? "Cancel" : "Edit mess"}
             variant="secondary"
+            leftIcon={showMessForm ? "close" : "edit"}
             onPress={() => setShowMessForm((v) => !v)}
           />
           {showMessForm ? (
@@ -517,13 +533,14 @@ export default function SettingsScreen() {
                     <Switch
                       value={value}
                       onValueChange={onChange}
-                      trackColor={{ true: "#0d9488", false: "#e2e8f0" }}
+                      trackColor={{ true: "#0f766e", false: "#dbe5dc" }}
                     />
                   )}
                 />
               </View>
               <Button
                 title="Save mess"
+                leftIcon="save"
                 loading={updateMessMutation.isPending}
                 onPress={messForm.handleSubmit(onSaveMess)}
               />
@@ -544,6 +561,7 @@ export default function SettingsScreen() {
             <Button
               title="Delete mess"
               variant="danger"
+              leftIcon="delete-forever"
               onPress={handleDeleteMess}
             />
           </View>
@@ -551,12 +569,13 @@ export default function SettingsScreen() {
           <Button
             title="Leave mess"
             variant="danger"
+            leftIcon="logout"
             onPress={handleLeaveMess}
           />
         )}
       </Card>
 
-      <Button title="Sign out" variant="danger" onPress={handleLogout} />
+      <Button title="Sign out" variant="danger" leftIcon="logout" onPress={handleLogout} />
     </Screen>
   );
 }

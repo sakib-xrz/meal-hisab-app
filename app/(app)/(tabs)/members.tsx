@@ -1,8 +1,10 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
+import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -93,6 +95,7 @@ export default function MembersScreen() {
         isManagerOrAbove ? (
           <Button
             title="Add member"
+            leftIcon="person-add-alt-1"
             size="lg"
             onPress={() => router.push("/(app)/members/add")}
           />
@@ -106,7 +109,7 @@ export default function MembersScreen() {
           onChange={setStatusFilter}
         />
         <Input
-          placeholder="Search by name..."
+          placeholder="Search by name"
           value={search}
           onChangeText={setSearch}
         />
@@ -126,12 +129,17 @@ export default function MembersScreen() {
       <View className="gap-3">
         {members.map((member) => (
           <Card key={member.id}>
-            <View className="mb-2 flex-row flex-wrap items-center gap-2">
-              <Text className="flex-1 font-sans text-base font-semibold text-foreground">
-                {member.fullName}
-              </Text>
-              <Badge label={member.roleKey} variant={roleBadgeVariant(member.roleKey)} />
-              <Badge label={member.status} variant={statusBadgeVariant(member.status)} />
+            <View className="mb-3 flex-row items-center">
+              <Avatar name={member.fullName} size="sm" className="mr-3" />
+              <View className="flex-1">
+                <Text className="font-sans text-base font-semibold text-foreground" numberOfLines={1}>
+                  {member.fullName}
+                </Text>
+                <View className="mt-1 flex-row flex-wrap gap-2">
+                  <Badge label={member.roleKey} variant={roleBadgeVariant(member.roleKey)} />
+                  <Badge label={member.status} variant={statusBadgeVariant(member.status)} />
+                </View>
+              </View>
             </View>
 
             {member.roomNo ? (
@@ -150,20 +158,30 @@ export default function MembersScreen() {
             ) : null}
 
             {isManagerOrAbove ? (
-              <View className="mt-3 flex-row gap-4 border-t border-border pt-3">
+              <View className="mt-3 flex-row gap-2 border-t border-border pt-3">
                 <Pressable
                   onPress={() => router.push(`/(app)/members/${member.id}`)}
                   hitSlop={8}
+                  className="h-9 flex-row items-center justify-center rounded-md bg-primary-soft px-3 active:opacity-80"
+                  accessibilityRole="button"
+                  accessibilityLabel={`Edit ${member.fullName}`}
                 >
-                  <Text className="font-sans text-sm font-semibold text-primary">Edit</Text>
+                  <MaterialIcons name="edit" size={16} color="#0b4f4a" />
+                  <Text className="ml-1.5 font-sans text-sm font-semibold text-primary-dark">
+                    Edit
+                  </Text>
                 </Pressable>
                 {canManageMember(member) ? (
                   <Pressable
                     onPress={() => handleRemove(member)}
                     disabled={removeMutation.isPending}
                     hitSlop={8}
+                    className="h-9 flex-row items-center justify-center rounded-md bg-danger-soft px-3 active:opacity-80 disabled:opacity-50"
+                    accessibilityRole="button"
+                    accessibilityLabel={`Remove ${member.fullName}`}
                   >
-                    <Text className="font-sans text-sm font-semibold text-danger">
+                    <MaterialIcons name="person-remove" size={16} color="#d9385e" />
+                    <Text className="ml-1.5 font-sans text-sm font-semibold text-danger">
                       Remove
                     </Text>
                   </Pressable>

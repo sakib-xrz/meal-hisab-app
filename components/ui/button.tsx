@@ -1,7 +1,10 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import type { ComponentProps } from "react";
 import {
   ActivityIndicator,
   Pressable,
   Text,
+  View,
   type PressableProps,
 } from "react-native";
 
@@ -12,15 +15,17 @@ type ButtonProps = PressableProps & {
   variant?: "primary" | "secondary" | "danger" | "ghost";
   size?: "md" | "lg";
   loading?: boolean;
+  leftIcon?: ComponentProps<typeof MaterialIcons>["name"];
+  rightIcon?: ComponentProps<typeof MaterialIcons>["name"];
   className?: string;
   textClassName?: string;
 };
 
 const variantClasses = {
-  primary: "bg-primary active:bg-primary-dark",
-  secondary: "bg-slate-100 active:bg-slate-200 border border-border",
+  primary: "bg-primary shadow-md shadow-primary/20 active:bg-primary-dark",
+  secondary: "border border-border bg-surface-muted active:bg-border",
   danger: "bg-danger active:opacity-90",
-  ghost: "bg-transparent active:bg-slate-100",
+  ghost: "bg-transparent active:bg-surface-muted",
 } as const;
 
 const textVariantClasses = {
@@ -36,15 +41,24 @@ export function Button({
   size = "md",
   loading,
   disabled,
+  leftIcon,
+  rightIcon,
   className,
   textClassName,
   ...props
 }: ButtonProps) {
+  const iconColor =
+    variant === "primary" || variant === "danger"
+      ? "#fffffc"
+      : variant === "ghost"
+        ? "#0f766e"
+        : "#16201f";
+
   return (
     <Pressable
       className={cn(
-        "items-center justify-center rounded-xl",
-        size === "lg" ? "px-5 py-3.5" : "px-4 py-3",
+        "min-h-11 flex-row items-center justify-center rounded-lg",
+        size === "lg" ? "px-5 py-3.5" : "px-4 py-2.5",
         variantClasses[variant],
         (disabled || loading) && "opacity-50",
         className
@@ -55,18 +69,30 @@ export function Button({
     >
       {loading ? (
         <ActivityIndicator
-          color={variant === "secondary" || variant === "ghost" ? "#0f172a" : "#ffffff"}
+          color={variant === "secondary" || variant === "ghost" ? "#16201f" : "#fffffc"}
         />
       ) : (
-        <Text
-          className={cn(
-            "font-sans text-base font-semibold",
-            textVariantClasses[variant],
-            textClassName
-          )}
-        >
-          {title}
-        </Text>
+        <>
+          {leftIcon ? (
+            <View className="mr-2">
+              <MaterialIcons name={leftIcon} size={18} color={iconColor} />
+            </View>
+          ) : null}
+          <Text
+            className={cn(
+              "font-sans text-base font-semibold",
+              textVariantClasses[variant],
+              textClassName
+            )}
+          >
+            {title}
+          </Text>
+          {rightIcon ? (
+            <View className="ml-2">
+              <MaterialIcons name={rightIcon} size={18} color={iconColor} />
+            </View>
+          ) : null}
+        </>
       )}
     </Pressable>
   );

@@ -18,11 +18,19 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
         tabBarStyle: {
           backgroundColor: Brand.surface,
-          borderTopColor: "#e2e8f0",
+          borderTopColor: Brand.border,
           borderTopWidth: 1,
-          height: Platform.OS === "ios" ? 88 : 64,
+          height: Platform.OS === "ios" ? 86 : 66,
           paddingTop: 8,
-          paddingBottom: Platform.OS === "ios" ? 28 : 10,
+          paddingBottom: Platform.OS === "ios" ? 26 : 10,
+          shadowColor: "#16201f",
+          shadowOpacity: 0.08,
+          shadowRadius: 18,
+          elevation: 12,
+        },
+        tabBarItemStyle: {
+          borderRadius: 8,
+          marginHorizontal: 3,
         },
         tabBarLabelStyle: {
           fontFamily: "PlusJakartaSans_500Medium",

@@ -1,6 +1,8 @@
 import { Text, View } from "react-native";
 import type { ToastConfig } from "react-native-toast-message";
 
+import { cn } from "@/lib/utils/cn";
+
 function ToastBase({
   text1,
   text2,
@@ -23,9 +25,16 @@ function ToastBase({
   } as const;
 
   return (
-    <View className={`mx-4 rounded-2xl border px-4 py-3 shadow-lg shadow-black/10 ${styles[variant]}`}>
+    <View
+      className={cn(
+        "mx-4 rounded-lg border px-4 py-3 shadow-lg shadow-foreground/10",
+        styles[variant],
+      )}
+    >
       {text1 ? (
-        <Text className={`font-sans text-base font-semibold ${titleColors[variant]}`}>{text1}</Text>
+        <Text className={cn("font-sans text-base font-semibold", titleColors[variant])}>
+          {text1}
+        </Text>
       ) : null}
       {text2 ? <Text className="mt-1 font-sans text-sm text-foreground-secondary">{text2}</Text> : null}
     </View>

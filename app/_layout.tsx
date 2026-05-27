@@ -9,11 +9,12 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import "../global.css";
 
+import { AppSplashScreen } from "@/components/ui/splash-screen";
 import { toastConfig } from "@/components/ui/toast-config";
 import { Brand } from "@/constants/theme";
 import { AuthProvider, useAuth } from "@/context/auth-provider";
@@ -74,24 +75,25 @@ function RootNavigator() {
           primary: Brand.primary,
           background: Brand.background,
           card: Brand.surface,
-          border: "#e2e8f0",
-          text: "#0f172a",
+          border: Brand.border,
+          text: Brand.text,
         },
       }}
     >
-      <View style={styles.root}>
-        <Stack screenOptions={{ headerShown: false, contentStyle: styles.stackContent }}>
+      <View className="flex-1 bg-background">
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { flex: 1, backgroundColor: Brand.background },
+          }}
+        >
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="(onboarding)" />
           <Stack.Screen name="(app)" />
         </Stack>
 
-        {!appReady ? (
-          <View style={styles.bootstrapOverlay} pointerEvents="none">
-            <View style={styles.bootstrapInner} />
-          </View>
-        ) : null}
+        {!appReady ? <AppSplashScreen /> : null}
       </View>
       <StatusBar style="dark" />
       <Toast config={toastConfig} />
@@ -110,21 +112,3 @@ export default function RootLayout() {
     </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: Brand.background,
-  },
-  stackContent: {
-    flex: 1,
-    backgroundColor: Brand.background,
-  },
-  bootstrapOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: Brand.primary,
-  },
-  bootstrapInner: {
-    flex: 1,
-  },
-});

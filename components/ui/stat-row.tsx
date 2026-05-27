@@ -14,7 +14,7 @@ export function StatRow({ label, value, highlight, className }: StatRowProps) {
     <View
       className={cn(
         "flex-row items-center justify-between border-b border-border py-3",
-        highlight && "rounded-xl bg-accent-soft/60 px-3 -mx-3 border-b-0",
+        highlight && "-mx-2 rounded-lg border-b-0 bg-accent-soft/70 px-3",
         className
       )}
     >

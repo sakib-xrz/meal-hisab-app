@@ -22,23 +22,42 @@ export function Input({
   containerClassName,
   passwordToggle,
   secureTextEntry,
+  editable,
+  onFocus,
+  onBlur,
   ...props
 }: InputProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const [focused, setFocused] = useState(false);
   const isSecure = passwordToggle ? !showPassword : secureTextEntry;
+  const isEditable = editable !== false;
 
   return (
     <View className={containerClassName}>
       <View className="relative">
         <TextInput
           className={cn(
-            "rounded-xl border bg-surface px-4 py-3 font-sans text-base text-foreground",
-            error ? "border-danger" : "border-border",
+            "min-h-12 rounded-lg border bg-surface px-4 py-3 font-sans text-base text-foreground shadow-sm shadow-foreground/5",
+            error
+              ? "border-danger"
+              : focused
+                ? "border-primary"
+                : "border-border",
+            !isEditable && "bg-surface-muted text-muted",
             passwordToggle && "pr-12",
             className
           )}
-          placeholderTextColor="#94a3b8"
+          placeholderTextColor="#8b9894"
           secureTextEntry={isSecure}
+          editable={editable}
+          onFocus={(event) => {
+            setFocused(true);
+            onFocus?.(event);
+          }}
+          onBlur={(event) => {
+            setFocused(false);
+            onBlur?.(event);
+          }}
           {...props}
         />
         {passwordToggle ? (
@@ -52,7 +71,7 @@ export function Input({
             <MaterialIcons
               name={showPassword ? "visibility-off" : "visibility"}
               size={22}
-              color="#94a3b8"
+              color={focused ? "#0f766e" : "#8b9894"}
             />
           </Pressable>
         ) : null}

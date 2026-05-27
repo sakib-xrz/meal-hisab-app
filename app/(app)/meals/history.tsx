@@ -1,7 +1,10 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Link, router } from "expo-router";
 import { Alert, Pressable, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
+import { ActionRow } from "@/components/ui/action-row";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
@@ -25,26 +28,49 @@ function MealHistoryCard({
 }) {
   return (
     <Card>
-      <Text className="mb-1 font-sans text-xs text-muted">
-        {formatDisplayDate(entry.mealDate)}
-      </Text>
-      <Text className="font-sans text-base font-semibold text-foreground">
-        {entry.member.fullName}
-      </Text>
-      <Text className="mt-1 font-sans text-sm text-muted">
-        B: {entry.breakfast} · L: {entry.lunch} · D: {entry.dinner} · Total: {entry.total}
-      </Text>
+      <View className="mb-3 flex-row items-start justify-between gap-3">
+        <View className="flex-1">
+          <Text className="mb-1 font-sans text-xs text-muted">
+            {formatDisplayDate(entry.mealDate)}
+          </Text>
+          <Text className="font-sans text-base font-semibold text-foreground">
+            {entry.member.fullName}
+          </Text>
+        </View>
+        <Badge label={`${entry.total} total`} variant="primary" />
+      </View>
+      <View className="flex-row flex-wrap gap-2">
+        <Badge label={`B ${entry.breakfast}`} variant="muted" />
+        <Badge label={`L ${entry.lunch}`} variant="accent" />
+        <Badge label={`D ${entry.dinner}`} variant="default" />
+      </View>
       {entry.note ? (
         <Text className="mt-1 font-sans text-sm italic text-muted">{entry.note}</Text>
       ) : null}
 
       {canEdit ? (
-        <View className="mt-3 flex-row gap-4 border-t border-border pt-3">
-          <Pressable onPress={() => onEdit(entry)} hitSlop={8}>
-            <Text className="font-sans text-sm font-semibold text-primary">Edit</Text>
+        <View className="mt-3 flex-row gap-2 border-t border-border pt-3">
+          <Pressable
+            onPress={() => onEdit(entry)}
+            hitSlop={8}
+            className="h-9 flex-row items-center rounded-md bg-primary-soft px-3 active:opacity-80"
+            accessibilityRole="button"
+          >
+            <MaterialIcons name="edit" size={16} color="#0b4f4a" />
+            <Text className="ml-1.5 font-sans text-sm font-semibold text-primary-dark">
+              Edit
+            </Text>
           </Pressable>
-          <Pressable onPress={() => onDelete(entry)} hitSlop={8}>
-            <Text className="font-sans text-sm font-semibold text-danger">Delete</Text>
+          <Pressable
+            onPress={() => onDelete(entry)}
+            hitSlop={8}
+            className="h-9 flex-row items-center rounded-md bg-danger-soft px-3 active:opacity-80"
+            accessibilityRole="button"
+          >
+            <MaterialIcons name="delete-outline" size={17} color="#d9385e" />
+            <Text className="ml-1.5 font-sans text-sm font-semibold text-danger">
+              Delete
+            </Text>
           </Pressable>
         </View>
       ) : null}
@@ -98,7 +124,7 @@ export default function MealHistoryScreen() {
   return (
     <Screen
       edges={[]}
-      subtitle={`${formatShortDate(from)} – ${formatShortDate(to)}`}
+      subtitle={`${formatShortDate(from)} - ${formatShortDate(to)}`}
       refreshing={historyQuery.isRefetching}
       onRefresh={() => historyQuery.refetch()}
     >
@@ -133,11 +159,13 @@ export default function MealHistoryScreen() {
       ) : null}
 
       <Link href="/(app)/meals/summary" asChild>
-        <Pressable className="mt-4">
-          <Text className="font-sans text-base font-medium text-primary">
-            View monthly summary →
-          </Text>
-        </Pressable>
+        <ActionRow
+          className="mt-4"
+          title="View monthly summary"
+          subtitle="Totals by member and date"
+          icon="analytics"
+          tone="accent"
+        />
       </Link>
     </Screen>
   );

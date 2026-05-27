@@ -1,3 +1,4 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Pressable, Text, View } from "react-native";
 
 import { cn } from "@/lib/utils/cn";
@@ -33,24 +34,29 @@ export function MealStepper({
   return (
     <View className={cn("items-center", className)}>
       {label ? (
-        <Text className="mb-1.5 font-sans text-xs font-medium text-muted">{label}</Text>
+        <Text className="mb-1.5 font-sans text-xs font-semibold text-muted">{label}</Text>
       ) : null}
       <Pressable
         onPress={disabled ? undefined : toggle}
         className={cn(
-          "h-12 w-12 items-center justify-center rounded-xl border-2",
+          "h-12 w-16 flex-row items-center justify-center rounded-lg border",
           disabled
-            ? "border-border bg-slate-50 opacity-60"
+            ? "border-border bg-surface-muted opacity-60"
             : current > 0
               ? "border-primary bg-primary-soft"
-              : "border-border bg-surface active:bg-slate-50"
+              : "border-border bg-surface active:bg-surface-muted"
         )}
         accessibilityRole="button"
         accessibilityLabel={label ? `${label} meal count ${current}` : `Meal count ${current}`}
       >
+        <MaterialIcons
+          name={current > 0 ? "check" : "add"}
+          size={16}
+          color={current > 0 ? "#0b4f4a" : "#64706d"}
+        />
         <Text
           className={cn(
-            "font-sans text-lg font-bold",
+            "ml-1 font-sans text-lg font-bold",
             current > 0 ? "text-primary-dark" : "text-foreground"
           )}
         >

@@ -146,12 +146,22 @@ export default function EditMealEntryScreen() {
   return (
     <Screen
       edges={[]}
-      subtitle={`${formatDisplayDate(entry.mealDate)} · ${entry.member.fullName}`}
+      subtitle={`${formatDisplayDate(entry.mealDate)} - ${entry.member.fullName}`}
       keyboardAvoid
       footer={
         <View className="gap-3">
-          <Button title="Save changes" loading={saveMutation.isPending} onPress={handleSave} />
-          <Button title="Delete entry" variant="danger" onPress={handleDelete} />
+          <Button
+            title="Save changes"
+            leftIcon="save"
+            loading={saveMutation.isPending}
+            onPress={handleSave}
+          />
+          <Button
+            title="Delete entry"
+            variant="danger"
+            leftIcon="delete-outline"
+            onPress={handleDelete}
+          />
         </View>
       }
     >

@@ -174,7 +174,12 @@ export default function EditMemberScreen() {
       keyboardAvoid
       footer={
         !isLeft && !isOwner ? (
-          <Button title="Remove member" variant="danger" onPress={handleRemove} />
+          <Button
+            title="Remove member"
+            variant="danger"
+            leftIcon="person-remove"
+            onPress={handleRemove}
+          />
         ) : undefined
       }
     >
@@ -287,7 +292,7 @@ export default function EditMemberScreen() {
 
           {isOwner ? (
             <Text className="font-sans text-sm text-muted">
-              Owner — role and status cannot be changed here. Use transfer ownership first.
+              Owner - role and status cannot be changed here. Use transfer ownership first.
             </Text>
           ) : (
             <>
@@ -316,6 +321,7 @@ export default function EditMemberScreen() {
           {!isLeft ? (
             <Button
               title="Save changes"
+              leftIcon="save"
               loading={updateMutation.isPending}
               onPress={handleSubmit(onSubmit)}
             />

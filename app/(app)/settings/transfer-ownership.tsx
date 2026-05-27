@@ -1,7 +1,9 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import { Alert, Pressable, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
+import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -92,17 +94,21 @@ export default function TransferOwnershipScreen() {
             <Pressable
               onPress={() => confirmTransfer(member.id, member.fullName)}
               disabled={transferMutation.isPending}
-              className="active:opacity-80"
+              className="flex-row items-center active:opacity-80"
             >
-              <View className="mb-2 flex-row items-center justify-between">
-                <Text className="font-sans text-base font-semibold text-foreground">
-                  {member.fullName}
+              <Avatar name={member.fullName} size="sm" className="mr-3" />
+              <View className="flex-1">
+                <View className="mb-1 flex-row items-center gap-2">
+                  <Text className="flex-1 font-sans text-base font-semibold text-foreground" numberOfLines={1}>
+                    {member.fullName}
+                  </Text>
+                  <Badge label={member.roleKey} variant="primary" />
+                </View>
+                <Text className="font-sans text-sm text-muted">
+                  {member.phone ?? "No phone linked"}
                 </Text>
-                <Badge label={member.roleKey} variant="primary" />
               </View>
-              <Text className="font-sans text-sm text-muted">
-                {member.phone ?? "No phone linked"}
-              </Text>
+              <MaterialIcons name="chevron-right" size={22} color="#64706d" />
             </Pressable>
           </Card>
         ))}

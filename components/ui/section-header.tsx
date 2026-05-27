@@ -16,8 +16,8 @@ export function SectionHeader({
   className,
 }: SectionHeaderProps) {
   return (
-    <View className={cn("mb-2 mt-4 flex-row items-center justify-between", className)}>
-      <Text className="font-sans text-sm font-semibold uppercase tracking-wide text-muted">
+    <View className={cn("mb-2 mt-5 flex-row items-center justify-between", className)}>
+      <Text className="font-sans text-sm font-bold text-foreground-secondary">
         {title}
       </Text>
       {actionLabel && onAction ? (

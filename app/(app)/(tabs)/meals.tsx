@@ -1,8 +1,12 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Link, router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
+import { ActionRow } from "@/components/ui/action-row";
+import { Avatar } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -39,26 +43,42 @@ function MealRow({
 }) {
   const hasEntry = Boolean(row.mealEntryId);
   const hasMeals = row.breakfast > 0 || row.lunch > 0 || row.dinner > 0;
+  const total = row.breakfast + row.lunch + row.dinner;
 
   return (
     <View className="border-b border-border py-4 last:border-b-0">
-      <View className="mb-3 flex-row items-start justify-between">
-        <Text className="flex-1 font-sans text-base font-semibold text-foreground">
-          {row.fullName}
-          {row.roomNo ? (
-            <Text className="font-normal text-muted"> · {row.roomNo}</Text>
-          ) : null}
-        </Text>
+      <View className="mb-3 flex-row items-center justify-between">
+        <View className="mr-3 flex-1 flex-row items-center">
+          <Avatar name={row.fullName} size="sm" className="mr-3" />
+          <View className="flex-1">
+            <Text className="font-sans text-base font-semibold text-foreground" numberOfLines={1}>
+              {row.fullName}
+            </Text>
+            <Text className="font-sans text-xs text-muted" numberOfLines={1}>
+              {row.roomNo ? `Room ${row.roomNo}` : "No room assigned"}
+            </Text>
+          </View>
+        </View>
+        <Badge label={`${total} meal${total === 1 ? "" : "s"}`} variant={hasMeals ? "primary" : "muted"} />
         {!readOnly && hasEntry ? (
-          <View className="flex-row gap-3">
-            <Pressable onPress={() => onEdit(row.mealEntryId!)} hitSlop={8}>
-              <Text className="font-sans text-sm font-semibold text-primary">Edit</Text>
+          <View className="ml-2 flex-row gap-2">
+            <Pressable
+              onPress={() => onEdit(row.mealEntryId!)}
+              hitSlop={8}
+              className="h-9 w-9 items-center justify-center rounded-md bg-primary-soft active:opacity-80"
+              accessibilityRole="button"
+              accessibilityLabel={`Edit ${row.fullName}'s meal`}
+            >
+              <MaterialIcons name="edit" size={18} color="#0b4f4a" />
             </Pressable>
             <Pressable
               onPress={() => onDelete(row.mealEntryId!, row.fullName)}
               hitSlop={8}
+              className="h-9 w-9 items-center justify-center rounded-md bg-danger-soft active:opacity-80"
+              accessibilityRole="button"
+              accessibilityLabel={`Delete ${row.fullName}'s meal`}
             >
-              <Text className="font-sans text-sm font-semibold text-danger">Delete</Text>
+              <MaterialIcons name="delete-outline" size={19} color="#d9385e" />
             </Pressable>
           </View>
         ) : null}
@@ -211,16 +231,21 @@ export default function MealsScreen() {
     >
       <Card className="mb-4 flex-row items-center justify-between p-3">
         <Button
-          title="← Prev"
+          title="Prev"
+          leftIcon="chevron-left"
           variant="secondary"
           className="px-3 py-2"
           onPress={() => setDate((d) => shiftDate(d, -1))}
         />
-        <Pressable onPress={() => setDate(todayApiDate())} hitSlop={8}>
-          <Text className="font-sans text-sm font-semibold text-primary">Today</Text>
-        </Pressable>
         <Button
-          title="Next →"
+          title="Today"
+          variant="ghost"
+          className="px-3 py-2"
+          onPress={() => setDate(todayApiDate())}
+        />
+        <Button
+          title="Next"
+          rightIcon="chevron-right"
           variant="secondary"
           className="px-3 py-2"
           onPress={() => setDate((d) => shiftDate(d, 1))}
@@ -257,32 +282,31 @@ export default function MealsScreen() {
           description="Add active members to start tracking meals."
         />
       ) : sheetQuery.isLoading || sheetQuery.isFetching ? (
-        <Text className="py-8 text-center font-sans text-muted">Loading meals…</Text>
+        <Text className="py-8 text-center font-sans text-muted">Loading meals...</Text>
       ) : null}
 
       {summary ? (
         <Card title="Day total" className="mb-4">
-          <Text className="font-sans text-base text-muted">
-            B: {summary.breakfast} · L: {summary.lunch} · D: {summary.dinner} · Total:{" "}
-            {summary.total}
-          </Text>
+          <View className="flex-row flex-wrap gap-2">
+            <Badge label={`Breakfast ${summary.breakfast}`} variant="muted" />
+            <Badge label={`Lunch ${summary.lunch}`} variant="primary" />
+            <Badge label={`Dinner ${summary.dinner}`} variant="accent" />
+            <Badge label={`Total ${summary.total}`} variant="default" />
+          </View>
         </Card>
       ) : null}
 
-      <View className="gap-2">
+      <View className="gap-3">
         <Link href="/(app)/meals/history" asChild>
-          <Pressable>
-            <Text className="font-sans text-base font-medium text-primary">
-              View all meal history →
-            </Text>
-          </Pressable>
+          <ActionRow title="View all meal history" subtitle="Past entries" icon="history" />
         </Link>
         <Link href="/(app)/meals/summary" asChild>
-          <Pressable>
-            <Text className="font-sans text-base font-medium text-primary">
-              Monthly summary →
-            </Text>
-          </Pressable>
+          <ActionRow
+            title="Monthly summary"
+            subtitle="Totals by member and date"
+            icon="analytics"
+            tone="accent"
+          />
         </Link>
       </View>
     </Screen>

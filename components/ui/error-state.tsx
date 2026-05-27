@@ -13,12 +13,19 @@ export function ErrorState({ message, onRetry, className }: ErrorStateProps) {
   return (
     <View
       className={cn(
-        "items-center rounded-2xl border border-danger-soft bg-danger-soft/40 px-4 py-8",
+        "items-center rounded-lg border border-danger-soft bg-danger-soft/50 px-4 py-8",
         className
       )}
     >
       <Text className="mb-4 text-center font-sans text-base text-danger">{message}</Text>
-      {onRetry ? <Button title="Try again" variant="secondary" onPress={onRetry} /> : null}
+      {onRetry ? (
+        <Button
+          title="Try again"
+          variant="secondary"
+          leftIcon="refresh"
+          onPress={onRetry}
+        />
+      ) : null}
     </View>
   );
 }

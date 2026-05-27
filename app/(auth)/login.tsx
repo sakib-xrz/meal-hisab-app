@@ -52,9 +52,13 @@ export default function LoginScreen() {
   };
 
   return (
-    <Screen keyboardAvoid contentClassName="pt-0">
-      <BrandHero compact className="mb-4" />
-      <Card title="Sign in" subtitle="Welcome back to your mess">
+    <Screen keyboardAvoid contentClassName="pt-4">
+      <BrandHero
+        compact
+        className="mb-6"
+        subtitle="Welcome back to your meal ledger"
+      />
+      <Card title="Sign in" subtitle="Access your mess dashboard">
         <View className="gap-4">
           <View>
             <Label>Phone</Label>
@@ -96,6 +100,7 @@ export default function LoginScreen() {
 
           <Button
             title="Sign In"
+            leftIcon="login"
             loading={isSubmitting}
             onPress={handleSubmit(onSubmit)}
           />

@@ -25,7 +25,7 @@ export function SegmentControl<T extends string>({
   return (
     <View
       className={cn(
-        "flex-row rounded-xl border border-border bg-slate-100 p-1",
+        "flex-row rounded-lg border border-border bg-surface-muted p-1",
         className
       )}
     >
@@ -36,7 +36,7 @@ export function SegmentControl<T extends string>({
             key={option.value}
             onPress={() => !disabled && onChange(option.value)}
             className={cn(
-              "flex-1 items-center rounded-lg px-3 py-2",
+              "min-h-10 flex-1 items-center justify-center rounded-md px-3 py-2",
               selected && "bg-surface shadow-sm shadow-black/5",
               disabled && "opacity-50"
             )}

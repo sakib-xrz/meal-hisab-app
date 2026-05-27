@@ -45,7 +45,7 @@ export function Avatar({ name, uri, size = "md", className }: AvatarProps) {
   return (
     <View
       className={cn(
-        "items-center justify-center overflow-hidden rounded-full bg-primary-soft",
+        "items-center justify-center overflow-hidden rounded-full border border-primary-soft bg-primary-soft",
         className
       )}
       style={{ width: dimension, height: dimension }}
