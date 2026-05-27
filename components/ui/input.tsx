@@ -14,6 +14,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+import { Brand } from "@/constants/theme";
 import { cn } from "@/lib/utils/cn";
 
 type MaterialIconName = ComponentProps<typeof MaterialIcons>["name"];
@@ -25,6 +26,8 @@ type InputProps = TextInputProps & {
   leftIcon?: MaterialIconName;
 };
 
+const INPUT_ACCENT_CLASS = "accent-primary";
+
 export function Input({
   error,
   className,
@@ -35,6 +38,11 @@ export function Input({
   leftIcon,
   onFocus,
   onBlur,
+  cursorColor: cursorColorProp,
+  selectionColor: selectionColorProp,
+  selectionHandleColor: selectionHandleColorProp,
+  cursorColorClassName,
+  selectionColorClassName,
   ...props
 }: InputProps) {
   const [showPassword, setShowPassword] = useState(false);
@@ -65,14 +73,20 @@ export function Input({
             </View>
           ) : null}
           <TextInput
+            {...props}
             className={cn(
-              "min-h-[52px] flex-1 bg-surface px-4 py-3.5 font-sans text-base text-foreground",
+              "min-h-[52px] flex-1 bg-surface px-4 py-3.5 font-sans text-base text-foreground caret-primary",
               !isEditable && "bg-surface-muted text-muted",
               passwordToggle && "pr-12",
               leftIcon && "pl-2.5",
               className,
             )}
             placeholderTextColor="#8b9894"
+            cursorColorClassName={cursorColorClassName ?? INPUT_ACCENT_CLASS}
+            selectionColorClassName={selectionColorClassName ?? INPUT_ACCENT_CLASS}
+            cursorColor={cursorColorProp ?? Brand.primary}
+            selectionColor={selectionColorProp ?? Brand.primary}
+            selectionHandleColor={selectionHandleColorProp ?? Brand.primary}
             secureTextEntry={isSecure}
             editable={editable}
             onFocus={(event) => {
@@ -85,7 +99,6 @@ export function Input({
               borderProgress.value = withTiming(0, { duration: 200 });
               onBlur?.(event);
             }}
-            {...props}
           />
           {passwordToggle ? (
             <Pressable

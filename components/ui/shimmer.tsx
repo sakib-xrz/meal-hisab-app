@@ -113,3 +113,25 @@ export function ShimmerMealRow({ className }: { className?: string }) {
     </View>
   );
 }
+
+export function ShimmerEditMeal({ className }: { className?: string }) {
+  return (
+    <View className={cn("gap-4", className)}>
+      <ShimmerBase height={16} width="75%" borderRadius={6} />
+      <View className="rounded-2xl border border-border bg-surface p-5">
+        <View className="flex-row justify-between px-2">
+          {(["Breakfast", "Lunch", "Dinner"] as const).map((meal) => (
+            <View key={meal} className="items-center">
+              <ShimmerBase height={12} width={56} borderRadius={4} className="mb-2" />
+              <ShimmerBase height={56} width={72} borderRadius={12} />
+            </View>
+          ))}
+        </View>
+      </View>
+      <View>
+        <ShimmerBase height={12} width={40} borderRadius={4} className="mb-2" />
+        <ShimmerBase height={80} borderRadius={12} />
+      </View>
+    </View>
+  );
+}

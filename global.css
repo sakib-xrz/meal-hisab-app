@@ -47,6 +47,13 @@
   --radius-full: 9999px;
 }
 
+@layer base {
+  input,
+  textarea {
+    caret-color: var(--color-primary);
+  }
+}
+
 @layer utilities {
   .font-medium {
     font-family: PlusJakartaSans_500Medium;

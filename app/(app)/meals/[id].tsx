@@ -11,7 +11,8 @@ import { ErrorState } from "@/components/ui/error-state";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MealStepper } from "@/components/ui/meal-stepper";
-import { LoadingScreen, Screen } from "@/components/ui/screen";
+import { Screen } from "@/components/ui/screen";
+import { Shimmer, ShimmerEditMeal } from "@/components/ui/shimmer";
 import { FadeIn } from "@/components/ui/animated-view";
 import { useAuth } from "@/context/auth-provider";
 import { ApiError } from "@/lib/api/client";
@@ -57,7 +58,7 @@ export default function EditMealEntryScreen() {
 
   const entry = entryFromList ?? entryFromDaily;
   const isLoading =
-    listQuery.isLoading || (dateParam ? dailyQuery.isLoading : false);
+    listQuery.isPending || (dateParam ? dailyQuery.isPending : false);
 
   const [breakfast, setBreakfast] = useState(0);
   const [lunch, setLunch] = useState(0);
@@ -140,7 +141,20 @@ export default function EditMealEntryScreen() {
   }
 
   if (isLoading) {
-    return <LoadingScreen />;
+    return (
+      <Screen
+        edges={[]}
+        keyboardAvoid
+        footer={
+          <View className="gap-3">
+            <Shimmer height={52} borderRadius={12} />
+            <Shimmer height={52} borderRadius={12} />
+          </View>
+        }
+      >
+        <ShimmerEditMeal />
+      </Screen>
+    );
   }
 
   if (!entry) {
