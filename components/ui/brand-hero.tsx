@@ -45,9 +45,6 @@ export function BrandHero({
       >
         <View className="mb-6 flex-row items-center justify-between self-stretch">
           <BrandMark size="lg" variant="light" />
-          <View className="rounded-full bg-accent px-3.5 py-1.5">
-            <Text className="font-sans text-xs font-bold text-foreground">Mess ready</Text>
-          </View>
         </View>
         <Text className="self-stretch font-sans text-3xl font-bold text-white">
           {title}

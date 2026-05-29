@@ -1,17 +1,23 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
+import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
+import { StaggerList } from "@/components/ui/animated-view";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  QRScannerSheet,
+  type QRScannerSheetRef,
+  type QRScanResult,
+} from "@/components/ui/qr-scanner-sheet";
 import { Screen } from "@/components/ui/screen";
 import { SegmentControl } from "@/components/ui/segment-control";
-import { FadeIn, StaggerList } from "@/components/ui/animated-view";
 import { ApiError } from "@/lib/api/client";
 import type { RoleKey } from "@/lib/api/types";
 import { useAddMember } from "@/lib/queries/members";
@@ -48,6 +54,7 @@ const ROLE_OPTIONS: { value: RoleKey; label: string }[] = [
 
 export default function AddMemberScreen() {
   const addMutation = useAddMember();
+  const scannerRef = useRef<QRScannerSheetRef>(null);
   const {
     control,
     handleSubmit,
@@ -67,6 +74,14 @@ export default function AddMemberScreen() {
   });
 
   const roleKey = watch("roleKey");
+
+  const handleScanSuccess = useCallback(
+    (data: QRScanResult) => {
+      setValue("fullName", data.name);
+      setValue("phone", data.phone);
+    },
+    [setValue],
+  );
 
   const onSubmit = async (values: FormValues) => {
     addMutation.mutate(
@@ -102,6 +117,15 @@ export default function AddMemberScreen() {
         manual profile. Managers can assign roles; owners cannot be created
         here.
       </Text>
+
+      {/* QR Scan Button */}
+      <Button
+        title="Scan QR Code"
+        leftIcon="qr-code-scanner"
+        variant="secondary"
+        onPress={() => scannerRef.current?.open()}
+        className="mb-4"
+      />
 
       <Card variant="glass">
         <StaggerList staggerMs={40} className="mb-4.5">
@@ -210,6 +234,9 @@ export default function AddMemberScreen() {
           />
         </StaggerList>
       </Card>
+
+      {/* QR Scanner Bottom Sheet */}
+      <QRScannerSheet ref={scannerRef} onScanSuccess={handleScanSuccess} />
     </Screen>
   );
 }

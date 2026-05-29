@@ -107,7 +107,6 @@ export default function MembersScreen() {
               leftIcon="person-add-alt-1"
               size="lg"
               onPress={() => router.push("/(app)/members/add")}
-              className="mb-16"
             />
           ) : undefined
         }

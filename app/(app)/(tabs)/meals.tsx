@@ -51,7 +51,7 @@ function MealRow({
   const hasMeals = row.breakfast > 0 || row.lunch > 0 || row.dinner > 0;
 
   return (
-    <View className="border-b border-border/50 py-4 last:border-b-0">
+    <View className="py-4">
       <View className="mb-3 flex-row items-center justify-between">
         <View className="mr-3 flex-1 flex-row items-center">
           <Avatar name={row.fullName} size="sm" className="mr-3" />
@@ -251,7 +251,6 @@ export default function MealsScreen() {
               loading={saveMutation.isPending}
               disabled={!dirty}
               onPress={handleSave}
-              className="mb-16"
             />
           ) : undefined
         }

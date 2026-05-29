@@ -1,17 +1,16 @@
 import { Tabs } from "expo-router";
 
 import { HapticTab } from "@/components/haptic-tab";
-import { FloatingGlassTabBar } from "@/components/ui/floating-glass-tab-bar";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { Colors } from "@/constants/theme";
+import { Brand, Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
 
   return (
     <Tabs
-      tabBar={(props) => <FloatingGlassTabBar {...props} />}
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tabIconSelected,
         tabBarInactiveTintColor: Colors[colorScheme ?? "light"].tabIconDefault,
@@ -19,10 +18,19 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          position: "absolute",
-          backgroundColor: "transparent",
-          borderTopWidth: 0,
+          height: 64,
+          backgroundColor: isDark ? Brand.glassDark : Brand.glassStrong,
+          borderTopColor: isDark ? Brand.glassDarkBorder : Brand.glassBorder,
+          borderTopWidth: 1,
           elevation: 0,
+          shadowColor: Brand.text,
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.05,
+          shadowRadius: 8,
+        },
+        tabBarLabelStyle: {
+          fontFamily: "PlusJakartaSans_500Medium",
+          fontSize: 10,
         },
       }}
     >
