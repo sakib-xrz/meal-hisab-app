@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { Text, View } from "react-native";
 
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +9,7 @@ import { MetricTile } from "@/components/ui/metric-tile";
 import { Screen } from "@/components/ui/screen";
 import { SectionHeader } from "@/components/ui/section-header";
 import { ShimmerCard, ShimmerMetricTile } from "@/components/ui/shimmer";
-import { FadeIn, StaggerList } from "@/components/ui/animated-view";
+import { StaggerList } from "@/components/ui/animated-view";
 import { useMealsSummary } from "@/lib/queries/meals";
 import {
   formatDisplayDate,
@@ -22,6 +23,12 @@ export default function MealSummaryScreen() {
   const summaryQuery = useMealsSummary(from, to);
 
   const summary = summaryQuery.data;
+  const hasMealData = Boolean(
+    summary &&
+      (summary.totalMeals > 0 ||
+        summary.byMember.length > 0 ||
+        summary.byDate.length > 0),
+  );
   const showSkeleton =
     summaryQuery.isLoading || (summaryQuery.isFetching && !summary);
 
@@ -53,7 +60,7 @@ export default function MealSummaryScreen() {
             <ShimmerCard />
           </View>
         </View>
-      ) : summary ? (
+      ) : summary && hasMealData ? (
         <>
           <MetricTile
             label="Total meals this month"
@@ -108,7 +115,9 @@ export default function MealSummaryScreen() {
       ) : summaryQuery.isSuccess ? (
         <EmptyState
           title="No meal data"
-          description="No meals recorded for this period."
+          description="No meals have been recorded for this month yet."
+          actionLabel="Record meals"
+          onAction={() => router.push("/(app)/(tabs)/meals")}
         />
       ) : null}
     </Screen>

@@ -1,12 +1,16 @@
 import { Tabs } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Brand, Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 
+const TAB_BAR_HEIGHT = 64;
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const insets = useSafeAreaInsets();
   const isDark = colorScheme === "dark";
 
   return (
@@ -18,7 +22,9 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          height: 64,
+          height: TAB_BAR_HEIGHT + insets.bottom,
+          paddingBottom: insets.bottom,
+          paddingTop: 6,
           backgroundColor: isDark ? Brand.glassDark : Brand.glassStrong,
           borderTopColor: isDark ? Brand.glassDarkBorder : Brand.glassBorder,
           borderTopWidth: 1,

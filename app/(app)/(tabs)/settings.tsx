@@ -101,23 +101,30 @@ export default function SettingsScreen() {
     resolver: zodResolver(messSchema),
     defaultValues: { name: "", address: "", phone: "", isActive: true },
   });
+  const { reset: resetProfileForm } = profileForm;
+  const { reset: resetMessForm } = messForm;
+  const userName = user?.name;
+  const messName = messQuery.data?.name;
+  const messAddress = messQuery.data?.address;
+  const messPhone = messQuery.data?.phone;
+  const messIsActive = messQuery.data?.isActive;
 
   useEffect(() => {
-    if (user) {
-      profileForm.reset({ name: user.name });
+    if (userName !== undefined) {
+      resetProfileForm({ name: userName });
     }
-  }, [user, profileForm]);
+  }, [userName, resetProfileForm]);
 
   useEffect(() => {
-    if (messQuery.data) {
-      messForm.reset({
-        name: messQuery.data.name,
-        address: messQuery.data.address ?? "",
-        phone: messQuery.data.phone ?? "",
-        isActive: messQuery.data.isActive,
+    if (messName !== undefined && messIsActive !== undefined) {
+      resetMessForm({
+        name: messName,
+        address: messAddress ?? "",
+        phone: messPhone ?? "",
+        isActive: messIsActive,
       });
     }
-  }, [messQuery.data, messForm]);
+  }, [messAddress, messIsActive, messName, messPhone, resetMessForm]);
 
   const onSaveProfile = async (values: z.infer<typeof profileSchema>) => {
     updateProfileMutation.mutate(
