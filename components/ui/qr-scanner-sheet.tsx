@@ -5,7 +5,11 @@ import {
   BottomSheetView,
   type BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
-import { CameraView, useCameraPermissions } from "expo-camera";
+import {
+  CameraView,
+  scanFromURLAsync,
+  useCameraPermissions,
+} from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import {
   forwardRef,
@@ -179,24 +183,40 @@ export const QRScannerSheet = forwardRef<
         return;
       }
 
-      // For gallery images, we use expo-camera's barcode scanner indirectly
-      // Since jsQR needs raw pixel data, we'll show a helpful message instead
-      // and recommend camera scanning for the best experience
+      const scannedCodes = await scanFromURLAsync(result.assets[0].uri, ["qr"]);
+      const parsedResult = scannedCodes
+        .map((code) => parseQRPayload(code.data))
+        .find((payload): payload is QRScanResult => payload !== null);
+
+      if (parsedResult) {
+        clearRetryTimer();
+        scanLockedRef.current = true;
+        setHasScanned(false);
+        setMode("idle");
+        onScanSuccess(parsedResult);
+        sheetRef.current?.dismiss();
+        return;
+      }
+
       Toast.show({
-        type: "info",
-        text1: "Use camera for best results",
-        text2: "Point your camera directly at the QR code",
+        type: "error",
+        text1: scannedCodes.length ? "Invalid QR code" : "No QR code found",
+        text2: scannedCodes.length
+          ? "This QR code is not from Meal Hisab"
+          : "Choose a clear image of a Meal Hisab QR code",
       });
-      setPickingImage(false);
-      setMode("camera");
+      sheetRef.current?.dismiss();
     } catch {
       Toast.show({
         type: "error",
-        text1: "Could not open gallery",
+        text1: "Could not scan image",
+        text2: "Choose a clear image of a Meal Hisab QR code",
       });
+      sheetRef.current?.dismiss();
+    } finally {
       setPickingImage(false);
     }
-  }, []);
+  }, [clearRetryTimer, onScanSuccess]);
 
   return (
     <BottomSheetModal
