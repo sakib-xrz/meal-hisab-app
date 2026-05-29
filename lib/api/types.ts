@@ -26,7 +26,7 @@ export interface Membership {
 
 export interface User {
   id: string;
-  name: string;
+  name: string | null;
   phone: string;
   avatarUrl?: string | null;
   isSuperAdmin: boolean;

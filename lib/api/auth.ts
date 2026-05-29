@@ -31,7 +31,7 @@ export function getMe() {
   return apiRequest<ApiUser>("/auth/me").then(normalizeUser);
 }
 
-export function updateProfile(input: { name: string }) {
+export function updateProfile(input: { name: string | null }) {
   return apiRequest<ApiUser>("/auth/profile", {
     method: "PATCH",
     body: input,

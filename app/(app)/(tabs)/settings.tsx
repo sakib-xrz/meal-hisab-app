@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, Switch, Text, View } from "react-native";
+import { Switch, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
@@ -38,7 +38,12 @@ import {
 import * as ImagePicker from "expo-image-picker";
 
 const profileSchema = z.object({
-  name: z.string().min(2, "Name is required"),
+  name: z
+    .string()
+    .max(80, "Name is too long")
+    .refine((value) => value.trim().length === 0 || value.trim().length >= 2, {
+      message: "Name must be at least 2 characters",
+    }),
 });
 
 const passwordSchema = z
@@ -81,6 +86,7 @@ export default function SettingsScreen() {
   const leaveMessMutation = useLeaveMess();
   const deleteMessMutation = useDeleteCurrentMess();
   const deleteMessSheet = useBottomSheetModal();
+  const leaveMessSheet = useBottomSheetModal();
   const removeAvatarSheet = useBottomSheetModal();
 
   const profileForm = useForm<z.infer<typeof profileSchema>>({
@@ -103,17 +109,18 @@ export default function SettingsScreen() {
   });
   const { reset: resetProfileForm } = profileForm;
   const { reset: resetMessForm } = messForm;
-  const userName = user?.name;
+  const userId = user?.id;
   const messName = messQuery.data?.name;
   const messAddress = messQuery.data?.address;
   const messPhone = messQuery.data?.phone;
   const messIsActive = messQuery.data?.isActive;
 
   useEffect(() => {
-    if (userName !== undefined) {
-      resetProfileForm({ name: userName });
-    }
-  }, [userName, resetProfileForm]);
+    if (!userId) return;
+    resetProfileForm({ name: user?.name ?? "" });
+    // Sync server name only when the signed-in user changes, not while editing.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid reset on every keystroke
+  }, [userId]);
 
   useEffect(() => {
     if (messName !== undefined && messIsActive !== undefined) {
@@ -128,9 +135,10 @@ export default function SettingsScreen() {
 
   const onSaveProfile = async (values: z.infer<typeof profileSchema>) => {
     updateProfileMutation.mutate(
-      { name: values.name },
+      { name: values.name.trim() || null },
       {
-        onSuccess: async () => {
+        onSuccess: async (updatedUser) => {
+          resetProfileForm({ name: updatedUser.name ?? "" });
           await refreshUser();
           Toast.show({ type: "success", text1: "Profile updated" });
         },
@@ -258,32 +266,26 @@ export default function SettingsScreen() {
   };
 
   const handleLeaveMess = () => {
-    Alert.alert("Leave mess", "Leave this mess? You will lose access.", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Leave",
-        style: "destructive",
-        onPress: () => {
-          leaveMessMutation.mutate(undefined, {
-            onSuccess: async () => {
-              await clearMess();
-              router.replace("/(onboarding)/create-mess");
-              Toast.show({ type: "success", text1: "Left mess" });
-            },
-            onError: (err) => {
-              Toast.show({
-                type: "error",
-                text1: "Could not leave mess",
-                text2:
-                  err instanceof ApiError
-                    ? err.message
-                    : "Something went wrong",
-              });
-            },
-          });
-        },
+    leaveMessSheet.open();
+  };
+
+  const confirmLeaveMess = () => {
+    leaveMessMutation.mutate(undefined, {
+      onSuccess: async () => {
+        leaveMessSheet.close();
+        await clearMess();
+        router.replace("/(onboarding)/create-mess");
+        Toast.show({ type: "success", text1: "Left mess" });
       },
-    ]);
+      onError: (err) => {
+        Toast.show({
+          type: "error",
+          text1: "Could not leave mess",
+          text2:
+            err instanceof ApiError ? err.message : "Something went wrong",
+        });
+      },
+    });
   };
 
   const handleDeleteMess = () => {
@@ -616,6 +618,19 @@ export default function SettingsScreen() {
         variant="danger"
         loading={deleteAvatarMutation.isPending}
         onConfirm={confirmRemoveAvatar}
+      />
+      <ConfirmSheet
+        sheetRef={leaveMessSheet.ref}
+        title="Leave mess"
+        description={
+          messQuery.data
+            ? `Leave "${messQuery.data.name}"? You will lose access to this mess.`
+            : "Leave this mess? You will lose access."
+        }
+        confirmLabel="Leave"
+        variant="danger"
+        loading={leaveMessMutation.isPending}
+        onConfirm={confirmLeaveMess}
       />
       <ConfirmSheet
         sheetRef={deleteMessSheet.ref}
