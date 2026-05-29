@@ -66,6 +66,8 @@ export const QRScannerSheet = forwardRef<
   QRScannerSheetProps
 >(function QRScannerSheet({ onScanSuccess }, ref) {
   const sheetRef = useRef<ComponentRef<typeof BottomSheetModal>>(null);
+  const scanLockedRef = useRef(false);
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [mode, setMode] = useState<ScanMode>("idle");
   const [hasScanned, setHasScanned] = useState(false);
@@ -73,22 +75,35 @@ export const QRScannerSheet = forwardRef<
 
   const snapPoints = useMemo(() => ["70%"], []);
 
+  const clearRetryTimer = useCallback(() => {
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
+  }, []);
+
   useImperativeHandle(ref, () => ({
     open: () => {
+      clearRetryTimer();
+      scanLockedRef.current = false;
       setHasScanned(false);
       setMode("idle");
       sheetRef.current?.present();
     },
     close: () => {
+      clearRetryTimer();
+      scanLockedRef.current = true;
       setMode("idle");
       sheetRef.current?.dismiss();
     },
   }));
 
   const handleDismiss = useCallback(() => {
+    clearRetryTimer();
+    scanLockedRef.current = true;
     setMode("idle");
     setHasScanned(false);
-  }, []);
+  }, [clearRetryTimer]);
 
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -105,18 +120,16 @@ export const QRScannerSheet = forwardRef<
 
   const handleBarCodeScanned = useCallback(
     ({ data }: { data: string }) => {
-      if (hasScanned) return;
+      if (scanLockedRef.current) return;
+      scanLockedRef.current = true;
       setHasScanned(true);
 
       const result = parseQRPayload(data);
       if (result) {
+        clearRetryTimer();
+        setMode("idle");
         onScanSuccess(result);
         sheetRef.current?.dismiss();
-        Toast.show({
-          type: "success",
-          text1: "Profile loaded from QR",
-          text2: `${result.name} • ${result.phone}`,
-        });
       } else {
         Toast.show({
           type: "error",
@@ -124,10 +137,14 @@ export const QRScannerSheet = forwardRef<
           text2: "This QR code is not from Meal Hisab",
         });
         // Allow scanning again after a brief delay
-        setTimeout(() => setHasScanned(false), 2000);
+        retryTimerRef.current = setTimeout(() => {
+          scanLockedRef.current = false;
+          setHasScanned(false);
+          retryTimerRef.current = null;
+        }, 2000);
       }
     },
-    [hasScanned, onScanSuccess],
+    [clearRetryTimer, onScanSuccess],
   );
 
   const handleStartCamera = useCallback(async () => {
@@ -142,9 +159,11 @@ export const QRScannerSheet = forwardRef<
         return;
       }
     }
+    clearRetryTimer();
+    scanLockedRef.current = false;
     setHasScanned(false);
     setMode("camera");
-  }, [permission, requestPermission]);
+  }, [clearRetryTimer, permission, requestPermission]);
 
   const handlePickImage = useCallback(async () => {
     setPickingImage(true);

@@ -1,8 +1,66 @@
-import { apiRequest } from "@/lib/api/client";
+import { ApiError, apiRequest } from "@/lib/api/client";
 import { resolveRoleKey } from "@/lib/api/normalize";
 import type { Member, MemberApiRow, RoleKey } from "@/lib/api/types";
 import { resolveAssetUrl } from "@/lib/utils/assets";
 import { normalizeApiDate } from "@/lib/utils/dates";
+
+export type AddMemberInput = {
+  fullName?: string;
+  phone?: string;
+  email?: string;
+  roomNo?: string;
+  roleKey?: RoleKey;
+  joiningDate?: string;
+};
+
+const pendingAddMemberRequests = new Map<string, Promise<Member>>();
+
+function normalizeAddMemberKey(input: AddMemberInput) {
+  return JSON.stringify({
+    fullName: input.fullName?.trim() ?? "",
+    phone: input.phone?.trim() ?? "",
+    email: input.email?.trim() ?? "",
+    roomNo: input.roomNo?.trim() ?? "",
+    roleKey: input.roleKey ?? "",
+    joiningDate: input.joiningDate?.trim() ?? "",
+  });
+}
+
+function normalizePhoneDigits(phone?: string | null) {
+  return phone?.replace(/\D/g, "") ?? "";
+}
+
+function isSamePhone(left?: string | null, right?: string | null) {
+  const leftDigits = normalizePhoneDigits(left);
+  const rightDigits = normalizePhoneDigits(right);
+
+  if (!leftDigits || !rightDigits) {
+    return false;
+  }
+
+  return leftDigits.endsWith(rightDigits) || rightDigits.endsWith(leftDigits);
+}
+
+export function isDuplicateMemberError(error: unknown) {
+  if (!(error instanceof ApiError)) {
+    return false;
+  }
+
+  const message = error.message.toLowerCase();
+  const code = error.code?.toLowerCase() ?? "";
+
+  return (
+    code.includes("duplicate") ||
+    code.includes("already_exists") ||
+    message.includes("phone number already exists") ||
+    (message.includes("phone") && message.includes("already exists"))
+  );
+}
+
+async function findExistingMemberByPhone(phone: string) {
+  const members = await listMembers({ status: "ACTIVE", limit: 500 });
+  return members.find((member) => isSamePhone(member.phone, phone)) ?? null;
+}
 
 function normalizeMember(row: MemberApiRow): Member {
   return {
@@ -45,19 +103,38 @@ export function listMembers(params?: {
   );
 }
 
-export function addMember(input: {
-  fullName?: string;
-  phone?: string;
-  email?: string;
-  roomNo?: string;
-  roleKey?: RoleKey;
-  joiningDate?: string;
-}) {
-  return apiRequest<MemberApiRow>("/messes/members", {
+export function addMember(input: AddMemberInput) {
+  const requestKey = normalizeAddMemberKey(input);
+  const pendingRequest = pendingAddMemberRequests.get(requestKey);
+
+  if (pendingRequest) {
+    return pendingRequest;
+  }
+
+  const request = apiRequest<MemberApiRow>("/messes/members", {
     method: "POST",
     body: input,
     tenant: true,
-  }).then(normalizeMember);
+  })
+    .then(normalizeMember)
+    .catch(async (error) => {
+      if (input.phone && isDuplicateMemberError(error)) {
+        const existingMember = await findExistingMemberByPhone(input.phone);
+
+        if (existingMember) {
+          return existingMember;
+        }
+      }
+
+      throw error;
+    })
+    .finally(() => {
+      pendingAddMemberRequests.delete(requestKey);
+    });
+
+  pendingAddMemberRequests.set(requestKey, request);
+
+  return request;
 }
 
 export function updateMember(

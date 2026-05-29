@@ -19,6 +19,7 @@ import {
 import { Screen } from "@/components/ui/screen";
 import { SegmentControl } from "@/components/ui/segment-control";
 import { ApiError } from "@/lib/api/client";
+import { isDuplicateMemberError, type AddMemberInput } from "@/lib/api/members";
 import type { RoleKey } from "@/lib/api/types";
 import { useAddMember } from "@/lib/queries/members";
 
@@ -55,6 +56,7 @@ const ROLE_OPTIONS: { value: RoleKey; label: string }[] = [
 export default function AddMemberScreen() {
   const addMutation = useAddMember();
   const scannerRef = useRef<QRScannerSheetRef>(null);
+  const addRequestLockedRef = useRef(false);
   const {
     control,
     handleSubmit,
@@ -75,39 +77,65 @@ export default function AddMemberScreen() {
 
   const roleKey = watch("roleKey");
 
+  const submitAddMember = useCallback(
+    (
+      input: AddMemberInput,
+      options: { successOnDuplicate?: boolean } = {},
+    ) => {
+      if (addRequestLockedRef.current || addMutation.isPending) return;
+
+      addRequestLockedRef.current = true;
+      addMutation.mutate(
+        input,
+        {
+          onSuccess: () => {
+            Toast.show({ type: "success", text1: "Member added" });
+            router.back();
+          },
+          onError: (err) => {
+            if (options.successOnDuplicate && isDuplicateMemberError(err)) {
+              Toast.show({ type: "success", text1: "Member added" });
+              router.back();
+              return;
+            }
+
+            addRequestLockedRef.current = false;
+            Toast.show({
+              type: "error",
+              text1: "Could not add member",
+              text2:
+                err instanceof ApiError ? err.message : "Something went wrong",
+            });
+          },
+        },
+      );
+    },
+    [addMutation],
+  );
+
   const handleScanSuccess = useCallback(
     (data: QRScanResult) => {
-      setValue("fullName", data.name);
-      setValue("phone", data.phone);
+      submitAddMember(
+        {
+          fullName: data.name,
+          phone: data.phone,
+          roleKey: "MEMBER",
+        },
+        { successOnDuplicate: true },
+      );
     },
-    [setValue],
+    [submitAddMember],
   );
 
   const onSubmit = async (values: FormValues) => {
-    addMutation.mutate(
-      {
-        fullName: values.fullName?.trim() || undefined,
-        phone: values.phone?.trim() || undefined,
-        email: values.email?.trim() || undefined,
-        roomNo: values.roomNo?.trim() || undefined,
-        joiningDate: values.joiningDate?.trim() || undefined,
-        roleKey: values.roleKey,
-      },
-      {
-        onSuccess: () => {
-          Toast.show({ type: "success", text1: "Member added" });
-          router.back();
-        },
-        onError: (err) => {
-          Toast.show({
-            type: "error",
-            text1: "Could not add member",
-            text2:
-              err instanceof ApiError ? err.message : "Something went wrong",
-          });
-        },
-      },
-    );
+    submitAddMember({
+      fullName: values.fullName?.trim() || undefined,
+      phone: values.phone?.trim() || undefined,
+      email: values.email?.trim() || undefined,
+      roomNo: values.roomNo?.trim() || undefined,
+      joiningDate: values.joiningDate?.trim() || undefined,
+      roleKey: values.roleKey,
+    });
   };
 
   return (
@@ -123,6 +151,8 @@ export default function AddMemberScreen() {
         title="Scan QR Code"
         leftIcon="qr-code-scanner"
         variant="secondary"
+        loading={addMutation.isPending}
+        disabled={addMutation.isPending}
         onPress={() => scannerRef.current?.open()}
         className="mb-4"
       />
